@@ -347,7 +347,7 @@ module peg_stand(peg_units = 1, thick = in*.75, height=3, front_drop=1, base_len
         
         //cut off the back to prevent interference
                 //cut off bottom so it can stand
-        translate([0,100+in+peg_thick,0]) cube([200,200,200], center=true);
+        translate([0,100+in+peg_thick+wall,0]) cube([200,200,200], center=true);
         
         %translate([0,in/4,-in*4]) cube([in,in,in]);
     }

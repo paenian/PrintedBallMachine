@@ -4,7 +4,7 @@ use <../clank_drop/clank_drop.scad>;
 use <../screw_drop/bowl_drop.scad>;
 use <../ball_return/ball_return.scad>;
 
-part = 10;
+part = 0;
 
 screw_rad = ball_rad+wall*2;
 screw_pitch = ball_rad*2+wall*2;
@@ -102,7 +102,7 @@ module slide_motor_mount(angle_inset = 20, max_angle = 75, motor_width = 20){
     }
 }
 
-
+//this is the lift module :-)
 module screw_inlet(){
     motor_width = 20;
     open_angle=0;
@@ -128,17 +128,17 @@ module screw_inlet(){
             //motor hangs under the inlet, with an adustable angle centered on the hole in the floor.
             %translate([peg_sep*2,screw_offset,0]) rotate([0,-90+angle,0]) rotate([0,90,0]) rotate([0,0,-90]) translate([0,0,-21]) motor_holes();
             
-            //the motor mount uses a zip tie to hold the motor in, allowing it to pivot to angle the screw a bit.
-            *translate([peg_sep*2.5,0,-.1]) slide_motor_mount(angle_inset = 30);
-            
             //guide track
            translate([in*2,in/2+screw_offset,0]) for(i=[0,1]) mirror([i,0,0]) rotate([0,0,open_angle]) translate([screw_rad+ball_rad+wall*1.5,0,0]) rotate([0,-90,0]) track(rise = 0, run = in*(4.25+i*.125));
             
             //balls
             *translate([in*3-ball_rad-wall,screw_offset,in*3+10]) sphere(r=ball_rad);
            
-           //false floor
-           mirror([0,1,0]) cube([in*3, in*3, in/2+1]);
+           //new floor, for better guides
+           hull(){
+               mirror([0,1,0]) cube([in*3, in*3, in*.5]);
+               mirror([0,1,0]) translate([in*2,0,0]) cube([in, in*3, in/2+in*.5]);
+           }
            
            //top exit track
            //rear
@@ -148,7 +148,7 @@ module screw_inlet(){
            //front
            translate([peg_sep*2,in/2+screw_offset-.75,in*4-back_drop*2]) mirror([1,1,0]) track(rise=-back_drop*2, run=in*2, solid=1, end_angle=90);
            
-           //old exit - straight shot
+           //exit supports
            translate([in*1.25,in/2+screw_offset+in*.15,in*3.5]) scale([1,1.3,1]) {
                //track(rise = -in/4, run = in*3);
                hull(){
@@ -163,11 +163,8 @@ module screw_inlet(){
         //front exit hole
         translate([peg_sep*2,in/2+screw_offset-.75,in*4-back_drop*2]) mirror([1,1,0]) track(rise=-back_drop*2, run=in*2, solid=1, end_angle=90, solid=-1);
         
-        //old exittrack hollow
-        *translate([in*1.5,in/2+screw_offset+in*.15,in*4]) scale([1,1.3,1]) track(rise = -in/4, run = in*3, solid=-1);
-        
         //guide track hollow
-           translate([in*2,screw_offset,wall*2]) hull() for(i=[0,1]) mirror([i,0,0]) rotate([0,0,open_angle]) translate([screw_rad-2.3,0,0]) {
+        translate([in*2,screw_offset,wall*2]) hull() for(i=[0,1]) mirror([i,0,0]) rotate([0,0,open_angle]) translate([screw_rad-2.3,0,0]) {
                //track(rise = 0, run = in*4.5, solid=-1);
                cylinder(r=ball_rad+wall, h=in*4.5);
            }
@@ -181,9 +178,13 @@ module screw_inlet(){
             hull(){
                 sphere(r=ball_rad+wall);
                 translate([screw_rad,-in*3-screw_offset+ball_rad+wall*2,wall*2]) sphere(r=ball_rad+wall);
+                //this added guy is an attempt to stop screw jams.
+                //translate([screw_rad,-in*3-screw_offset+ball_rad+wall*2,wall*2+ball_rad*2]) sphere(r=ball_rad+wall);
+                translate([0,0,wall*2+ball_rad*2]) sphere(r=ball_rad+wall/2);
             }
         }
         
+        //ball paths
         translate([in*2,screw_offset,ball_rad+wall*2]) for(i=[0,1]) mirror([0,i,0]) {
             hull(){
                 translate([0,-in*3-screw_offset+ball_rad+wall*2,wall*2]) sphere(r=ball_rad+wall);

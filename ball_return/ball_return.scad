@@ -2,7 +2,7 @@ include<../configuration.scad>
 use <../base.scad> 
 use <../pins.scad>
 
-part = 3;
+part = 0;
 
 if(part == 0)
     rotate([0,90,0]) rear_ball_return_inlet();
@@ -68,9 +68,9 @@ module ball_return_peg(){
 
 module rear_ball_return_inlet(width=2){
     %translate([0,in/4+wall+wall,0]) cube([in,in,in]);
-    inset = .75-.25;
+    inset = .75-.25-wall/in;
     
-    front_inset = -1;
+    front_inset = 0;
     
     difference(){
         union(){
@@ -118,7 +118,7 @@ module rear_ball_return_inlet(width=2){
         translate([100+in+wall/2,0,0]) cube([200,200,200], center=true);
         
         //flatten the back side for 
-        translate([0,100+in*1.25+wall+wall,0]) cube([200,200,200], center=true);
+        translate([0,100+in*1.25+wall,0]) cube([200,200,200], center=true);
     }
 }
 
@@ -187,8 +187,8 @@ module pegboard_attach(){
 
 module rear_ball_return_outlet(){
     //%translate([0,in/2,0]) cube([in,in,in]);
-    inset = .75-.25;
-    front_inset = -1;
+    inset = .75-.25-wall/in;
+    front_inset = 0;
     difference(){
         union(){
             //inlet catcher - extends to the back, to deposit balls there.
@@ -243,7 +243,7 @@ module rear_ball_return_outlet(){
         mirror([1,0,0]) translate([100+in+wall/2,0,0]) cube([200,200,200], center=true);
         
         //flatten the back side for 
-        translate([0,100+in*1.25+wall+wall,0]) cube([200,200,200], center=true);
+        translate([0,100+in*1.25+wall,0]) cube([200,200,200], center=true);
     }
 }
 
@@ -269,7 +269,7 @@ module pegboard_attach_2_old(){
         }
 
 module dowel_holder(){
-    separation = 16-4;
+    separation = 16-4-2;
     
     insert_angle = 30;
     
@@ -302,7 +302,7 @@ module dowel_holder(){
 }
 
 module dowel_holes(dowel_hole=50){
-        separation = 16-4;
+        separation = 16-4-2;
     
     insert_angle = 30;
     
