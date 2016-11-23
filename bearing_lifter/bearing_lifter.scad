@@ -13,7 +13,7 @@ hole_rad = 8;
 lift_rad = in*3;
 num_balls = 17;
 
-part = 10;
+part = 8;
 
 //next section
 %translate([in*12,0,in*1]) inlet();
@@ -21,23 +21,23 @@ part = 10;
 
 //laid out for printing
 if(part == 0)
-    bearing_inlet();
+    rotate([270,0,0]) bearing_inlet();
 if(part == 1)
     bearing();
 if(part == 2)
     bearing(bearing=false, drive_gear=true);
 if(part == 3)
-    bearing_outlet();
+    rotate([270,0,0]) bearing_outlet();
 if(part == 4)
-    screw_drop(inlet_length=2, exit=-1);
-if(part == 5)
+    rotate([270,0,0]) screw_drop(inlet_length=2, height = 1.5);
+if(part == 5)   //DEPRECATED
     inlet_switch(left_length = 3, right_length = 2);
 if(part == 6)
-    switch();
+    switch();   //DEPRECATED
 if(part == 7)
-    bowl_drop(inlet_length=3, height = 2, rad=1.5, height_scale=.8*in, lower=4.9);
-if(part == 8)
-    offset_slope_module(size = [3, -.5], offset=1);
+    rotate([270,0,0]) bowl_drop(inlet_length=3, height = 2, rad=1.5, height_scale=.8*in, lower=4.9);
+if(part == 8)   //to pass on balls without much drop
+    rotate([270,0,0]) offset_slope_module(size = [3, -.5], offset=1);
 if(part == 9)
     bearing_fingergaurd();
 
@@ -58,17 +58,17 @@ module assembled(inlet = 1, outlet = 1){
     //translate([0,0,0]) offset_slope_module(size = [3, -.5], offset=1);
     
     if(inlet==1)
-        translate([0,0,in*3]) bearing_inlet();
+        translate([0,0,in*2]) bearing_inlet();
     else{
-        translate([0,0,in*3]) mirror([1,0,0])
+        translate([0,0,in*2]) mirror([1,0,0])
         bearing_inlet();
     }
     
-    translate([in*3.5,-in*1-1-ball_rad*2-wall,in*8]) rotate([90,0,0]) mirror([0,0,1]) rotate([0,0,30]) bearing();
+    translate([in*4.5,-in*1-1-ball_rad*2-wall,in*6]) rotate([90,0,0]) mirror([0,0,1]) rotate([0,0,30]) bearing();
     
-    translate([in*3.5,-in*1-1-ball_rad*2-wall,in*8+1]) rotate([90,0,0]) bearing_fingergaurd();
+    translate([in*4.5,-in*1-1-ball_rad*2-wall,in*6+1]) rotate([90,0,0]) bearing_fingergaurd();
     
-    translate([0,0,in*3]) bearing_outlet();
+    translate([0,0,in*2]) bearing_outlet();
     
     //rear recirculator
     translate([in*12,0,in*5]) rear_ball_return_inlet();
