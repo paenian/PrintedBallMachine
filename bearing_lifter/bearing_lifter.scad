@@ -13,7 +13,7 @@ hole_rad = 8;
 lift_rad = in*3;
 num_balls = 17;
 
-part = 8;
+part = 1;
 
 //next section
 %translate([in*12,0,in*1]) inlet();
@@ -244,7 +244,7 @@ module bearing(bearing=true, drive_gear=false){
     // thickness
     T=ball_rad*2+wall/2;
     // clearance
-    tol=.15;
+    tol=.25;
     number_of_planets=7;
     number_of_teeth_on_planets=11;
     approximate_number_of_teeth_on_sun=21;
