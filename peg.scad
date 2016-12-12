@@ -19,12 +19,12 @@ if(part == 3)   //peg that catches marbles
         ball_return_peg();
 
 if(part == 4)   //stand for a 12x12 board
-    translate([0,0,-peg_sep/2+peg_rad-1]) rotate([0,0,90]) rotate([90,0,0]) rotate([0,0,90])
+    mirror([1,0,0]) translate([0,0,-peg_sep/2+peg_rad-1]) rotate([0,0,90]) rotate([90,0,0]) rotate([0,0,90])
         peg_stand();
 
 if(part == 5)   //stand for a 12x12 board
     translate([0,0,-peg_sep/2+peg_rad-1]) rotate([0,0,90]) rotate([90,0,0]) rotate([0,0,90])
-        peg_stand(height=5, front_drop=2);
+        peg_stand();
 
 if(part == 6)   //joins two boards together
     rotate([90,0,0]) peg_joiner();
@@ -330,7 +330,7 @@ module peg_stand(peg_units = 1, thick = in*.75, height=3, front_drop=1, base_len
                         translate([0,-base_length/2,0]) 
                         rotate([90,0,0]) translate([-thick/2,-thick/2,0])cube([thick, thick, wall]);
                         translate([0,-(wall+in/4)/2,0]) rotate([90,0,0]) translate([-thick/2,-thick/2,0]) cube([thick, thick, wall]);
-                        #translate([0,-(wall+in/4)/2,brace_height]) rotate([90,0,0]) translate([-thick/2,-thick/2,0]) cube([thick, thick, wall]);
+                        translate([0,-(wall+in/4)/2,brace_height]) rotate([90,0,0]) translate([-thick/2,-thick/2,0]) cube([thick, thick, wall]);
                     }
                 }
                 
@@ -345,9 +345,8 @@ module peg_stand(peg_units = 1, thick = in*.75, height=3, front_drop=1, base_len
         //cut off bottom so it can stand
         translate([-100-peg_rad+cutoff,0,0]) cube([200,200,200], center=true);
         
-        //cut off the back to prevent interference
-                //cut off bottom so it can stand
-        translate([0,100+in+peg_thick+wall,0]) cube([200,200,200], center=true);
+        //cut off the back to snug up to the pegboard
+        translate([0,100+peg_thick+rear_gap,0]) cube([200,200,200], center=true);
         
         %translate([0,in/4,-in*4]) cube([in,in,in]);
     }

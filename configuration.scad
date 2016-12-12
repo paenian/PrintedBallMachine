@@ -13,6 +13,9 @@ wall=3;
 
 //used for the ball return
 dowel_rad = (3/8)/2*in;
+dowel_sep = 16-2;
+dowel_holder_height = wall*3;
+rear_gap = 1.25*in;
 
 //ball variables
 ball_rad = 5/8*in/2;

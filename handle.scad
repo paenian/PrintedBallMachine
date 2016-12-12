@@ -16,10 +16,15 @@ handle_thick = in*.5;
 
 part = 1;
 
+%translate([-in*1.5,in*.5,0]) handle();
+
 if(part == 0)
     translate([0,0,handle_thick/2]) handle();
 
 if(part == 1)
+    mirror([1,0,0]) rotate([90,0,0]) handle_mount();
+
+if(part == 2)
     rotate([90,0,0]) handle_mount();
 
 if(part == 10)
@@ -35,20 +40,30 @@ module assembled(){
 module handle_mount(){
     taper = in/32;
     
-    height = .75*in;   //the gap should be 1" + wall exactly.  The handle protrudes 1/4" behind the pegboard, but the handle mount is mounted by pegboard hooks - so it's 1"-1/4", with the wall provided by the pegs.
+    height = rear_gap - .25*in;  //the gap should be rear_gap.  The handle protrudes 1/4" behind the pegboard, but the handle mount is mounted by pegboard hooks - so it's 1"-1/4", with the wall provided by the pegs.
     
     inset = 1;
     
     difference(){
         union(){
             //hangers
-            translate([in/2*0,wall,in]) {
-                hanger(solid=1, hole=[1,1], drop = in*2);
+            translate([in/2*0,wall,in]) hull() {
+                hanger(solid=1, hole=[1,1], drop = in*1);
                 hanger(solid=1, hole=[0,1], drop = in*2);
             }
             
             //mounting plate
-            rotate([-90,0,0]) cylinder(r=in, h=height);
+            difference(){
+                hull(){
+                    translate([-in/2, 0, in/2]) rotate([-90,0,0]) cylinder(r=in/3, h=height);
+                    translate([in/2, 0, in/2]) rotate([-90,0,0]) cylinder(r=in/3, h=height);
+                    translate([-in/2, 0, -in*1.5]) rotate([-90,0,0]) cylinder(r=in/3, h=height);
+                }
+                //clearance for the screw holding the handle in
+                translate([-in/2, -1, -in*1.5]) rotate([-90,0,0]) cylinder(r=in/4, h=height+2);
+            }
+            
+            % rotate([-90,0,0]) cylinder(r=in, h=height);
             
             //handle hanger
             for(i=[-1,1]) translate([in*.5*i,0,in*.5]) {
