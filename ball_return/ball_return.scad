@@ -2,7 +2,7 @@ include<../configuration.scad>
 use <../base.scad> 
 use <../pins.scad>
 
-part = 5;
+part = 3;
 
 if(part == 0)
     rotate([0,90,0]) rear_ball_return_inlet();
@@ -17,7 +17,7 @@ if(part == 4)
     translate([0,0,peg_thick/2-slop]) rotate([90,0,0]) ball_return_peg();
 
 if(part == 5)
-    translate([0,0,peg_thick/2-slop]) rotate([90,0,0]) ball_return_joint();
+    translate([0,0,peg_thick/2-slop]) rotate([0,90,0]) ball_return_joint();
 
 if(part == 10){
     %translate([-in*12,wall,-in*5]) pegboard([12,12]);

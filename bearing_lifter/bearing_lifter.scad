@@ -13,7 +13,7 @@ hole_rad = 8;
 lift_rad = in*3;
 num_balls = 17;
 
-part = 1;
+part = 9;
 
 //next section
 %translate([in*12,0,in*1]) inlet();
