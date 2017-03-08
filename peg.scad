@@ -8,6 +8,9 @@ part = 4;
 if(part == 0)   //peg
     translate([0,0,-peg_sep/2+peg_rad-1]) rotate([0,0,90]) rotate([90,0,0]) rotate([0,0,90]) peg(peg=PEG_HOOK);
 
+if(part == 50)  //peg with bottom leg
+    translate([0,0,-peg_sep/2+peg_rad-1]) rotate([0,0,90]) rotate([90,0,0]) rotate([0,0,90]) peg(peg=PEG_LOWER_HOOK);
+
 if(part == 1)   //double length peg - good for supporting bigger modules
     translate([0,0,-peg_sep/2+peg_rad-1]) rotate([0,0,90]) rotate([90,0,0]) rotate([0,0,90]) peg(peg=PEG_HOOK, peg_units=2);
 
@@ -177,6 +180,16 @@ module peg(peg=PEG_HOOK, peg_units=1, lower_peg_thick = peg_thick){
                 translate([0,-wall*2-front_inset,0]) rotate([peg_angle,0,0]) cylinder(r1=peg_rad*3/4, r2=peg_rad*3/4-slop, h=wall*2);
                 translate([0,-wall*2-front_inset,0]) rotate([peg_angle,0,0]) translate([0,0,wall*2]) sphere(r=peg_rad*3/4-slop);
             }
+            
+            if(peg==PEG_LOWER_HOOK){
+                translate([0,0,-peg_sep]){
+                    translate([0,-wall+.1,0]) rotate([90,0,0]) cylinder(r1=peg_rad, r2=peg_rad*3/4, h=wall+peg_rad-front_inset);
+                    translate([0,-wall*2-front_inset,0]) sphere(r=peg_rad*3/4);
+                    translate([0,-wall*2-front_inset,0]) rotate([peg_angle,0,0]) cylinder(r1=peg_rad*3/4, r2=peg_rad*3/4-slop, h=wall*2);
+                    translate([0,-wall*2-front_inset,0]) rotate([peg_angle,0,0]) translate([0,0,wall*2]) sphere(r=peg_rad*3/4-slop);
+                }
+            }
+            
             if(peg==PEG_PIN){
                 //draw a pin connector instead
                 rotate([90,0,0]) rotate([0,0,90]) translate([0,0,wall/2])pin_vertical(h=wall*2+wall/2,r=pin_rad,lh=wall,lt=pin_lt,t=pin_tolerance,cut=false);
@@ -196,6 +209,15 @@ module peg(peg=PEG_HOOK, peg_units=1, lower_peg_thick = peg_thick){
         //cut off top and bottom for easier printing
         translate([100+peg_rad-cutoff,0,0]) cube([200,200,200], center=true);
         translate([-100-peg_rad+cutoff,0,0]) cube([200,200,200], center=true);
+        
+        //if it's a lower peg, delete the bottom
+        if(peg==PEG_LOWER_HOOK){
+            difference(){
+                translate([0,0,-100-peg_sep]) cube([200,200,200], center=true);
+                translate([0,0,-peg_sep]) rotate([90,0,0]) cylinder(r=peg_rad, h=50, center=true);
+                
+            }
+        }
     }
 }
 
@@ -334,7 +356,11 @@ module peg_stand(peg_units = 1, thick = in*.75, height=3, front_drop=1, base_len
                     }
                 }
                 
-                translate([0,-base_length/2-wall,brace_height+thick/2]) scale([1,(base_length-wall*2)/in,(2*brace_height+thick)/in]) rotate([0,90,0]) cylinder(r=in/2, h=20, center=true, $fn=60);
+                hull(){
+                    translate([0,-base_length/2-wall,brace_height+thick/2-i*thick/2]) scale([1,(base_length-wall*2)/in,(2*brace_height+thick)/in]) rotate([0,90,0]) cylinder(r=in/2, h=20, center=true, $fn=60);
+                    translate([0,-base_length/2-wall,brace_height+thick/2]) scale([1,(base_length-wall*2)/in,(2*brace_height+thick)/in]) rotate([0,90,0]) cylinder(r=in/2, h=20, center=true, $fn=60);
+                    
+                }
             }
         }
         

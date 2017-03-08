@@ -14,7 +14,7 @@ wall=3;
 //used for the ball return
 dowel_rad = (3/8)/2*in;
 dowel_sep = 16-2;
-dowel_holder_height = wall*3;
+dowel_holder_height = 20;
 rear_gap = 1.25*in;
 
 //ball variables
@@ -38,6 +38,7 @@ FLIP_FLOP = 9;
 
 PEG_PIN = 1;
 PEG_HOOK = 2;
+PEG_LOWER_HOOK = 3;
 PEG_NONE = 0;
 
 m3_rad = 3/2 + slop;

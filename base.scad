@@ -16,8 +16,12 @@ slope_module();
 
 //this module angles to the other side, acts as a brake to slow down long runs.
 //rotate([-90,0,0])
+!union(){
+    %translate([0,0,-in*4]) pegboard([12,12]);
+    slope_module(size=[5,-1.5]);
+}
 
-!inlet(height=2, width=2, length=1, outlet=INLET_SLOT, hanger_height=1);//, inset=0);
+inlet(height=2, width=2, length=1, outlet=INLET_SLOT, hanger_height=1);//, inset=0);
 
 
 *translate([in*10,0,-in*2]) 
@@ -54,7 +58,7 @@ module slope_module(size = [4, -.5], width=3, inlet = NORMAL){
             }
             
             translate([in,0,in*2]) track(rise=(size[1]*1.1)*in, run=(size[0]*1.1)*in, solid=1, end_angle=0);
-            hanger(solid=1, hole=[floor(size[0])+1,3], drop = in/2);
+            hanger(solid=1, hole=[floor(size[0])+1,3], drop = -size[1]*in);
         }
         //hole in the inlet
         *translate([in,0,in*2]) track(rise=size[1], run=size[0], solid=-1, hanger=0, extra_len=in-wall*1.5);
