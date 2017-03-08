@@ -357,7 +357,7 @@ module peg_stand(peg_units = 1, thick = in*.75, height=3, front_drop=1, base_len
                 }
                 
                 hull(){
-                    translate([0,-base_length/2-wall,brace_height+thick/2-i*thick/2]) scale([1,(base_length-wall*2)/in,(2*brace_height+thick)/in]) rotate([0,90,0]) cylinder(r=in/2, h=20, center=true, $fn=60);
+                    translate([0,-base_length/2-wall,brace_height+thick/2-i*thick/2]) scale([1,(base_length-wall*2)/in,(2*brace_height+thick)/in-i/2]) rotate([0,90,0]) cylinder(r=in/2, h=20, center=true, $fn=60);
                     translate([0,-base_length/2-wall,brace_height+thick/2]) scale([1,(base_length-wall*2)/in,(2*brace_height+thick)/in]) rotate([0,90,0]) cylinder(r=in/2, h=20, center=true, $fn=60);
                     
                 }
@@ -372,7 +372,7 @@ module peg_stand(peg_units = 1, thick = in*.75, height=3, front_drop=1, base_len
         translate([-100-peg_rad+cutoff,0,0]) cube([200,200,200], center=true);
         
         //cut off the back to snug up to the pegboard
-        translate([0,100+peg_thick+rear_gap,0]) cube([200,200,200], center=true);
+        translate([0,100+peg_thick+rear_gap+wall,0]) cube([200,200,200], center=true);
         
         %translate([0,in/4,-in*4]) cube([in,in,in]);
     }
