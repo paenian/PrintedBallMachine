@@ -1,6 +1,7 @@
 include <../configuration.scad>;
 use <../base.scad>;
 use <../pins.scad>;
+use <../screw_drop/screw_drop.scad>;
 
 //motor variables
 dflat=.2;
@@ -15,22 +16,36 @@ assembled();
 
 
 //stair variables
+stair_length = 7*in;
+num_steps = 5;
 step_drop = .125*in;    //the slope per step
-step_length = in*1.5;
+step_length = stair_length/num_steps;
 step_width = in-wall;
 step_height = in*1.5;
     
 
 module assembled(){
     %pegboard([12,12]);
+    //previous bit
+    %translate([-in*5,0,in*7]) slope_module();
+    //next bit
+    %translate([in*12,0,in*7]) slope_module();
+    //handle
+    %translate([in*6.5,0,in*12]) cube([in*4, in, in], center=true);
     
-    stair_inlet();
+    #translate([0,0,in*7]) screw_drop(inlet_length = 2, height = 1.5);
     
-    translate([in*1,0,in*1.5-step_height]) fixed_stair();
+    translate([in*4,0,in*5]) {
+        stair_inlet();
     
-    %translate([in*1+step_length/2,-step_width*2,in*1.5-step_height]) mirror([0,1,0]) fixed_stair();
+        translate([in*1,0,in*1.5-step_height]) fixed_stair();
+        
+        
     
-    %translate([in*7,0,in*3]) slope_module();
+        //%translate([in*1+step_length/2,-step_width*2,in*1.5-step_height]) mirror([0,1,0]) fixed_stair();
+    
+        //translate([in*7,0,in*1]) slope_module();
+    }
 }
 
 
@@ -39,15 +54,7 @@ module stair_inlet(){
     difference(){
         union(){
             inlet(height=2, width=3, length=1, outlet=INLET_HOLE, hanger_height=3, inset=0);
-            
-            //add a motor mount underneath the inlet
-            hull(){
-                translate([in,-in*1.5,in/2]) rotate([0,0,0]) rotate([0,90,0]) motorHoles(1, slot=5);
-                translate([0,-in/2,in]) rotate([0,90,0]) cylinder(r=in/2, h=wall);
-            }
         }
-        
-        #translate([in,-in*1.5,in/2]) rotate([0,0,0]) rotate([0,90,0]) motorHoles(0, slot=5);
     }
 }
 
@@ -94,7 +101,24 @@ module stair_step(solid = 1, entrance = 0, exit = 0){
     }
 }
 
-module fixed_stair(step_height = in, num_steps = 4){
+module motor_mount(solid = 1){
+    if(solid == 1){
+        //motor mount
+        hull(){
+            translate([num_steps*step_length/2, -in, -in/2]) rotate([90,0,0])  rotate([0,0,90]){            
+                %translate([0,0,1+ball_rad*2+wall/2+2]) rotate([0,0,8]) rotate([180,0,0]) bearing(bearing=false, drive_gear=true);
+                translate([0,0,-.1]) hull() rotate([0,0,-90]) motorHoles(1, slot=5);
+            }
+            #translate([num_steps*step_length/2,-wall/2,step_height*2]) cube([in*2,wall,in], center=true);
+        }
+    }else{
+        translate([num_steps*step_length/2, -in, -in/2]) rotate([90,0,0])  rotate([0,0,90]){
+            #translate([0,0,-.1]) rotate([0,0,-90]) motorHoles(0, slot=5);
+        }
+    }
+}
+
+module fixed_stair(step_height = in){
     difference(){
         union(){
             for(i=[0:num_steps-1]){
@@ -104,9 +128,11 @@ module fixed_stair(step_height = in, num_steps = 4){
                 echo(floor((step_length*i)/in));
                 //stair hangers
                 hanger(hole=[ceil((step_length*i)/in),num_steps+1], solid=1, drop=in*(num_steps-i));
+                
+                hanger(hole=[ceil((step_length*i)/in),num_steps+1], solid=1, drop=in*(num_steps-i), rot=-45);
             }
             
-            //motor mount
+            motor_mount(solid = 1);
         }
         
         for(i=[0:num_steps-1]){
@@ -116,6 +142,11 @@ module fixed_stair(step_height = in, num_steps = 4){
             //stair hangers
             hanger(hole=[ceil((step_length*i)/in),num_steps+1], solid=-1, drop=in*(num_steps-i));
         }
+        
+        motor_mount(solid = -1);
+        
+        //chop the very end off
+        translate([num_steps*step_length+50-1, 0, num_steps*step_height]) cube([100,100,100], center=true);
     }
 }
 

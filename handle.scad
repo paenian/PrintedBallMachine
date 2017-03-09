@@ -104,7 +104,7 @@ module handle(){
                 
                 hull(){
                     translate([.55*in,.5*in,0]) rotate([0,0,45/2]) cylinder(r=(height-.6)*in/2, h=200, center=true, $fn=8);
-                    translate([-.55*in,.5*in,0]) rotate([0,0,45/2]) cylinder(r=(height-.6)*in/2, h=200, center=true, $fn=8);
+                    translate([-1.55*in,.5*in,0]) rotate([0,0,45/2]) cylinder(r=(height-.6)*in/2, h=200, center=true, $fn=8);
                 }
             }
             sphere(r=min_rad, $fn=8);
