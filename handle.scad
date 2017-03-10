@@ -14,7 +14,7 @@ width = 4.75;
 height = 3.125;
 handle_thick = in*.5;
 
-part = 1;
+part = 0;
 
 %translate([-in*1.5,in*.5,0]) handle();
 
@@ -104,7 +104,10 @@ module handle(){
                 
                 hull(){
                     translate([.55*in,.5*in,0]) rotate([0,0,45/2]) cylinder(r=(height-.6)*in/2, h=200, center=true, $fn=8);
-                    translate([-1.55*in,.5*in,0]) rotate([0,0,45/2]) cylinder(r=(height-.6)*in/2, h=200, center=true, $fn=8);
+                    translate([-.55*in,.5*in,0]) rotate([0,0,45/2]) cylinder(r=(height-.6)*in/2, h=200, center=true, $fn=8);
+                    
+                    translate([.55*in,1.5*in,0]) rotate([0,0,45/2]) cylinder(r=(height-.6)*in/2, h=200, center=true, $fn=8);
+                    translate([-.55*in,1.5*in,0]) rotate([0,0,45/2]) cylinder(r=(height-.6)*in/2, h=200, center=true, $fn=8);
                 }
             }
             sphere(r=min_rad, $fn=8);

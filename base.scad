@@ -229,9 +229,9 @@ module inlet(height = 1, width = 3, length = 1, hanger_height=1, lift=5, outlet=
             if(outlet == INLET_SLOT){
               hull(){
                     translate([inlet_x,inlet_y-in/2,in/2]) translate([0,0,0]) sphere(r=in/2-wall);
-                    translate([inlet_x-in/2,inlet_y-in/2,in/2+5]) translate([0,0,0]) sphere(r=ball_rad);
-                    translate([inlet_x,inlet_y-in/2-in,in/2]) translate([0,0,0]) sphere(r=in/2-wall);
-                    translate([inlet_x-in/2,inlet_y-in/2-in,in/2+5]) translate([0,0,0]) sphere(r=ball_rad);
+                    translate([inlet_x-in/2,inlet_y-in/2,in/2+wall]) translate([0,0,0]) sphere(r=ball_rad+wall/2);
+                    translate([inlet_x,inlet_y+in/2-in*width,in/2]) translate([0,0,0]) sphere(r=in/2-wall);
+                    #translate([inlet_x-in/2,inlet_y+in/2-in*width,in/2+wall]) translate([0,0,0]) sphere(r=ball_rad+wall/2);
                 }
             }
             
