@@ -14,9 +14,11 @@ slope_module();
 *inlet_switch();
 *switch();
 
+!default_panel();
+
 //this module angles to the other side, acts as a brake to slow down long runs.
 //rotate([-90,0,0])
-!union(){
+union(){
     %translate([0,0,-in*4]) pegboard([12,12]);
     slope_module(size=[5,-1.5]);
 }
@@ -43,6 +45,14 @@ module pegboard(size = [12,6]){
         for(i=[1:size[0]])
             for(j=[1:size[1]])
                 translate([i*peg_sep, 0, j*peg_sep]) rotate([90,0,0]) cylinder(r=peg_rad, h=in, center=true);
+    }
+}
+
+module default_panel(){
+    union(){
+        pegboard(size = [12,12]);
+        translate([-peg_sep*4,0, peg_sep*4]) slope_module(size = [3,-.5]);
+        translate([peg_sep*12,0,peg_sep*5]) slope_module();
     }
 }
 

@@ -2,29 +2,30 @@
 This is a lifter module, utilizing a print-in-place bearing.
 
 Mechanical Parts:
-1 motors
+1 motor
 2 M5 screws and nuts for the handle
-4 M3 screws to attach the motor
+2 M3 screws to attach the motor
 1 M3 screw to attach the guard
 
 Parts to Print:
-1 * bl_inlet.stl
-1 * bl_outlet.stl
-1 * bl_lift_gear.stl
-1 * bl_drive_gear.stl
-1 * bl_spiral.stl
-1 * bl_guard.stl
+1 * bl_inlet.stl - marbles go in; also mounts the motor & bearing.
+1 * bl_outlet.stl - marbles come out.
+1 * bl_lift_gear.stl - the big bearing
+1 * bl_drive_gear.stl - drive gear, attaches to the motor
+1 * bl_guard.stl - finger guard, cuz the bearing's got ouchy torque
+1 * bl_spiral.stl - a simple spiral drop.
 
 
 Standard Parts
-2 * stand.stl
-1 * handle.stl
-1 * breturn_inlet.stl
-1 * breturn_outlet.stl
-2 * breturn_peg.stl
-4 * peg_1x.stl
-1 * peg_2x.stl
-6 * peg_3x.stl
+1 * stand_left.stl - pegboard stand
+1 * stand_right.stl - pegboard stand
+1 * handle.stl - to carry the pegboard
+1 * breturn_inlet.stl - ball return!
+1 * breturn_outlet.stl - ball return!
+2 * breturn_peg.stl - special peg for the return
+3 * peg_1x.stl - 1" peg
+4 * peg_2x.stl - 2" peg
+4 * peg_3x.stl - 3" peg
 
 Notes:
 Motor direction matters!

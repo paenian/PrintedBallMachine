@@ -13,11 +13,7 @@ hole_rad = 8;
 lift_rad = in*3;
 num_balls = 17;
 
-part = 9;
-
-//next section
-%translate([in*12,0,in*1]) inlet();
-%translate([in*12,0,in*4]) inlet();
+part = 10;
 
 //laid out for printing
 if(part == 0)
@@ -30,14 +26,6 @@ if(part == 3)
     rotate([270,0,0]) bearing_outlet();
 if(part == 4)
     rotate([270,0,0]) screw_drop(inlet_length=2, height = 1.5);
-if(part == 5)   //DEPRECATED
-    inlet_switch(left_length = 3, right_length = 2);
-if(part == 6)
-    switch();   //DEPRECATED
-if(part == 7)
-    rotate([270,0,0]) bowl_drop(inlet_length=3, height = 2, rad=1.5, height_scale=.8*in, lower=4.9);
-if(part == 8)   //to pass on balls without much drop
-    rotate([270,0,0]) offset_slope_module(size = [3, -.5], offset=1);
 if(part == 9)
     bearing_fingergaurd();
 
@@ -48,32 +36,20 @@ if(part==10){
 
 //assembled unit, 12x12, for sale.  Includes all parts except mounting pegs.
 //This module requires 14 pegs, at least 6 of which are the insert type.
-module assembled(inlet = 1, outlet = 1){
-    %pegboard([12,12]);
+module assembled(){
+    //draw in the pegboard & rear ball return
+    basic_panel();
     
     //frilly outlet
     translate([in*8,0,peg_sep*6]) screw_drop(inlet_length=2, height = 1.5);
     
-    //direct inlet
-    //translate([0,0,0]) offset_slope_module(size = [3, -.5], offset=1);
-    
-    if(inlet==1)
-        translate([0,0,in*2]) bearing_inlet();
-    else{
-        translate([0,0,in*2]) mirror([1,0,0])
-        bearing_inlet();
-    }
-    
-    translate([in*4.5,-in*1-1-ball_rad*2-wall,in*6]) rotate([90,0,0]) mirror([0,0,1]) rotate([0,0,30]) bearing();
-    
-    translate([in*4.5,-in*1-1-ball_rad*2-wall,in*6+1]) rotate([90,0,0]) bearing_fingergaurd();
-    
+    //bearing lifter
+    translate([0,0,in*2]) bearing_inlet();
+    *translate([in*4.5,-in*1-1-ball_rad*2-wall,in*6]) rotate([90,0,0]) mirror([0,0,1]) rotate([0,0,30]) bearing();
+    *translate([in*4.5,-in*1-1-ball_rad*2-wall,in*6+1]) rotate([90,0,0]) bearing_fingergaurd();
     translate([0,0,in*2]) bearing_outlet();
     
-    //rear recirculator
-    translate([in*12,0,in*5]) rear_ball_return_inlet();
-    
-    translate([0,0,in*4]) rear_ball_return_outlet();
+    //also need feet, pegs, and handle.
 }
 
 module bearing_fingergaurd(){
@@ -158,7 +134,7 @@ module bearing_inlet(){
            translate([in/2, -in, in*2+6]) rotate([90,0,0])  rotate([0,0,90]){
             
               %translate([0,0,1+ball_rad*2+wall/2+2]) rotate([0,0,8]) rotate([180,0,0]) bearing(bearing=false, drive_gear=true);
-              translate([0,0,-.1]) hull() rotate([0,0,-90]) motorHoles(1, slot=5);
+              translate([0,0,-.1]) hull() rotate([0,0,-90]) motorHoles(1, slot=8);
            }
                   
             hanger(solid=1, hole=[5,4], drop=in*3.4, rot=5);
@@ -176,7 +152,7 @@ module bearing_inlet(){
             
                         //new motor mount - right angled beastie
            translate([in/2, -in, in*2+6]) rotate([90,0,0])  rotate([0,0,90]){
-              rotate([0,0,-90]) motorHoles(0, slot=5);
+              rotate([0,0,-90]) motorHoles(0, slot=8);
            }
         
         hanger(solid=-1, hole=[5,4], drop=in*6.5);

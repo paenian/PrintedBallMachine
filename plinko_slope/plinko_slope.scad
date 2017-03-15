@@ -14,6 +14,8 @@ module plinko_slope(printable = true, in_width = 3, out_width=3, length = 4, dro
         union(){
             inlet(outlet = INLET_SLOT, width = in_width);
             
+            //extra hangers
+            
             //the plate
             hull(){
                 //top
@@ -35,7 +37,6 @@ module plinko_slope(printable = true, in_width = 3, out_width=3, length = 4, dro
             
             //the pegs
             for(i=[0:3]){
-                translate([in*1.5, ])
             }
        }
     }

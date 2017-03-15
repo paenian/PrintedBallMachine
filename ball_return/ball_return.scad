@@ -2,7 +2,7 @@ include<../configuration.scad>
 use <../base.scad> 
 use <../pins.scad>
 
-part = 2;
+part = 10;
 
 if(part == 0)
     rotate([0,90,0]) rear_ball_return_inlet();
@@ -20,27 +20,35 @@ if(part == 5)
     translate([0,0,peg_thick/2-slop]) rotate([0,90,0]) ball_return_joint();
 
 if(part == 10){
-    %translate([-in*12,wall,-in*5]) pegboard([12,12]);
-    
-    translate([in*8, 0, -in*4]) offset_slope_module();
-    translate([in*9+.1, 0, -in*7]) offset_slope_module();
+   basic_panel();
+}
 
-    translate([in*13,0,-in*3]) rear_ball_return_inlet();
-    translate([in*9,0,-in*4]) rear_ball_return_outlet();
+module basic_panel(){
+    union(){
+        %pegboard([12,12]);
+    
+        //translate([in*8, 0, -in*4]) offset_slope_module();
+        //translate([in*9+.1, 0, -in*7]) offset_slope_module();
+
+        translate([in*12,0,in*5]) rear_ball_return_inlet();
+        translate([0,0,in*4]) rear_ball_return_outlet();
+    }
 }
 
 module ball_return_joint(){
     difference(){
         union(){
-            translate([-slop,0,0]) dowel_holder();
+            translate([0,0,0]) dowel_holder();
+            
             #translate([-wall/2+dowel_holder_height/2,0,17]) cube([1,dowel_sep+dowel_rad*2+1,dowel_rad], center=true);
-            translate([dowel_holder_height+slop,0,0]) dowel_holder();
+            
+            translate([dowel_holder_height-.1,0,0]) dowel_holder();
         }
         
         //ball path
         translate([0,0,wall]) hull(){
             for(i=[-dowel_holder_height*2, dowel_holder_height*2]) translate([i,0,0])
-                sphere(r=ball_rad+wall/2);
+                sphere(r=ball_rad+slop*2, $fn=60);
         }
     }
 }
@@ -94,6 +102,7 @@ module rear_ball_return_inlet(width=2){
     exit_offset = peg_thick+wall + rear_gap/2 + wall/2;
     dowel_lift = -in*.55;
     
+    translate([0,-wall,0])
     difference(){
         union(){
             //inlet catcher - extends to the back, to deposit balls there.
@@ -122,18 +131,19 @@ module rear_ball_return_inlet(width=2){
         union(){
                 //exit slope
                 hull(){
-                    #translate([in/2,exit_offset,in-wall*3]) sphere(r=ball_rad+wall);
-                    #translate([-in/2,exit_offset,in-wall*4]) sphere(r=ball_rad+wall);
+                    translate([in/2,exit_offset,in-wall*3]) sphere(r=ball_rad+wall);
+                    translate([-in/2,exit_offset,in-wall*4.25]) sphere(r=ball_rad+wall/2);
                 }
                 
                 //horizontal slope
                 hull(){
-                    #translate([in/2,exit_offset,in-wall*3]) sphere(r=ball_rad+wall);
+                    translate([in/2,exit_offset,in-wall*3]) sphere(r=ball_rad+wall);
                     translate([in/2,-in*(width-.5),in-wall]) sphere(r=ball_rad+wall);
                 }
         }
        
-        translate([0,exit_offset,dowel_lift]) dowel_holes();
+        //dowel holes
+        translate([0,exit_offset,dowel_lift]) dowel_holes(flare_len = dowel_holder_height/3);
         
         //flatten the far side for printing on
         translate([100+in+wall/2,0,0]) cube([200,200,200], center=true);
@@ -216,7 +226,7 @@ module rear_ball_return_outlet(){
     
     dowel_lift = -in*.75;
     
-    
+    translate([0,-wall,0])
     difference(){
         union(){
             //inlet catcher - extends to the back, to deposit balls there.
@@ -261,7 +271,7 @@ module rear_ball_return_outlet(){
             }
         
         //rods coming in :-)
-        mirror([0,0,1]) translate([dowel_holder_height/2+1,exit_offset,dowel_lift]) dowel_holes(dowel_hole=wall*3+.1);
+        mirror([0,0,1]) translate([dowel_holder_height/2+1,exit_offset,dowel_lift]) dowel_holes(dowel_holder_height/3);
                 
         //flatten the far side for printing on
         mirror([1,0,0]) translate([100+in+wall/2,0,0]) cube([200,200,200], center=true);
@@ -292,7 +302,7 @@ module pegboard_attach_2_old(){
             }
         }
 
-module dowel_holder(){
+module dowel_holder(flare_len = dowel_holder_height/4){
     separation = dowel_sep;
     
     insert_angle = 30;
@@ -307,26 +317,11 @@ module dowel_holder(){
             }
         }
         
-        //the rods
-        for(i=[-separation/2,separation/2]) translate([0-wall/2,i,in/2+1]){
-            rotate([0,90,0]) cylinder(r=dowel_rad, h=height+1, center=true);
-            translate([height/4,0,0]) rotate([0,90,0]) cylinder(r1=dowel_rad-.1, r2=dowel_rad*1.25, h=height/4+.1);
-            translate([-height/2-.1-height/4,0,0]) rotate([0,90,0]) cylinder(r2=dowel_rad-.1, r1=dowel_rad*1.25, h=height/4+.1);
-        }
-        
-        //rod insert area
-        //%translate([0-wall/2,-wall*3/4-dowel_rad+separation/2,in/2+2-dowel_rad-wall]) rotate([0,90,0]) cylinder(r=dowel_rad, h=wall*30, center=true);
-        translate([0-wall/2,0,in/2+1-separation/2]) difference(){
-            translate([0,0,3]) cube([height+1, separation, separation], center=true);
-            translate([0,0,separation/2+3]) rotate([0,90,0]) scale([1,1,height/4]) sphere(r=4, h=40, center=true);
-            
-            for(i=[0,1]) mirror([0,i,0]) translate([0,separation/2,separation/2-dowel_rad-wall/2]) rotate([0,90,0]) cylinder(r=wall, h=40, center=true);
-            
-        }
+        dowel_holes(flare_len=flare_len);
     }
 }
 
-module dowel_holes(dowel_hole=50){
+module dowel_holes(flare_len = dowel_holder_height/4){
         separation = dowel_sep;
     
     insert_angle = 30;
@@ -336,20 +331,21 @@ module dowel_holes(dowel_hole=50){
     union(){
         
         //the rods
-        //the rods
         for(i=[-separation/2,separation/2]) translate([0-wall/2,i,in/2+1]){
             rotate([0,90,0]) cylinder(r=dowel_rad, h=height+1, center=true);
-            translate([height/4,0,0]) rotate([0,90,0]) cylinder(r1=dowel_rad-.1, r2=dowel_rad*1.25, h=height/4+.1);
-            translate([-height/2-.1-height/4,0,0]) rotate([0,90,0]) cylinder(r2=dowel_rad-.1, r1=dowel_rad*1.25, h=height/4+.1);
+            
+            //flare the inlet/outlet
+            translate([height/2-flare_len,0,0]) rotate([0,90,0]) cylinder(r1=dowel_rad-.1, r2=dowel_rad*1.25, h=flare_len+.1);
+            translate([-height/2-.1,0,0]) rotate([0,90,0]) cylinder(r2=dowel_rad-.1, r1=dowel_rad*1.25, h=flare_len+.2);
         }
         
         //rod insert area
         //%translate([0-wall/2,-wall*3/4-dowel_rad+separation/2,in/2+2-dowel_rad-wall]) rotate([0,90,0]) cylinder(r=dowel_rad, h=wall*30, center=true);
-        *translate([0-wall/2,0,in/2+1-separation/2]) difference(){
-            translate([0,0,3]) cube([separation, separation, separation], center=true);
-            translate([0,0,separation/2+3]) rotate([0,90,0]) scale([1,1,1.25]) sphere(r=4, h=40, center=true);
+        translate([0-wall/2,0,in/2+1-separation/2]) difference(){
+            translate([0,0,3]) cube([height+1, separation, separation], center=true);
+            translate([0,0,separation/2+3]) rotate([0,90,0]) scale([1,1,height/4]) sphere(r=4, h=40, center=true);
             
-            //for(i=[0,1]) mirror([0,i,0]) translate([0,separation/2,separation/2-dowel_rad-wall/2]) rotate([0,90,0]) cylinder(r=wall/2, h=40, center=true);
+            for(i=[0,1]) mirror([0,i,0]) translate([0,separation/2,separation/2-dowel_rad-wall/2]) rotate([0,90,0]) cylinder(r=wall, h=40, center=true);
             
         }
     }
