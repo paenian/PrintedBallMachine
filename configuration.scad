@@ -44,6 +44,9 @@ PEG_NONE = 0;
 m3_rad = 3/2 + slop;
 m3_cap_rad = 6/2 + slop;
 
+m5_rad = 5/2 + slop;
+m5_cap_rad = 10/2 + slop;
+
 //pin variables
 pin_tolerance = .25;
 pin_rad = 4;

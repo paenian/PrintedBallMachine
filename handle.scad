@@ -14,7 +14,7 @@ width = 4.75;
 height = 3.125;
 handle_thick = in*.5;
 
-part = 0;
+part = 3;
 
 %translate([-in*1.5,in*.5,0]) handle();
 
@@ -27,6 +27,9 @@ if(part == 1)
 if(part == 2)
     rotate([90,0,0]) handle_mount();
 
+if(part == 3)
+    standoff();
+
 if(part == 10)
     assembled();
 
@@ -34,6 +37,22 @@ module assembled(){
     translate([0,0,handle_thick/2]) handle();
     
     translate([in*1.5,-in*.5,-in*.75]) rotate([90,0,0]) handle_mount();
+}
+
+module standoff(screw = m5_rad, height = 35){
+    difference(){
+        union(){
+            hull(){
+                rotate([0,0,360/16]) cylinder(r1=in*.75, r2=m5_cap_rad*2, h=height, $fn=8);
+                translate([0,peg_sep,0]) cylinder(r1=peg_rad*3, r2=peg_rad*2, h=height, $fn=8);
+            }
+            translate([0,peg_sep,0]) cylinder(r1=peg_rad, r2=peg_rad-slop, h=height+peg_thick*.75);
+            translate([0,peg_sep,height+peg_thick*.75]) scale([1,1,1/(peg_thick*.25)]) sphere(r=peg_rad-slop);
+        }
+        
+        //screwhole
+        cylinder(r=screw + slop/2, h=height*3, center=true);
+    }
 }
 
 //this is a double-peg-mounted cylinder to attach the handle to.

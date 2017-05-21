@@ -470,7 +470,7 @@ module track_curve(angle=45){
         translate([0,0,-peg_sep/2-.5]) cube([peg_sep+1, peg_sep+1, peg_sep+1]);
         translate([0,0,-peg_sep/2-.5]) rotate([0,0,angle]) cube([peg_sep, peg_sep, peg_sep]);
         rotate_extrude(convexity=10){
-            rotate([0,0,90]) translate([0,in/2+.1,0]) track_slice();
+            rotate([0,0,90]) translate([0,in/2+.01,0]) track_slice();
         }
     }
 }
@@ -489,29 +489,29 @@ module track_curve_2(angle=90, drop=-10, track_angle = -80){
         union(){
             //the inlet is extra-long, to meet the slope this attaches to.
             hull(){
-                rotate([0,0,90]) translate([0*drop/(num_steps+1),in/2+.1,extra_drop]) track_slice_2();
-                rotate([0,0,90]) translate([1*drop/(num_steps+1),in/2+.1,0]) track_slice_2();
+                rotate([0,0,90]) translate([0*drop/(num_steps+1),in/2+.01,extra_drop]) track_slice_2();
+                rotate([0,0,90]) translate([1*drop/(num_steps+1),in/2+.01,0]) track_slice_2();
             }
                 
             //the curved angle
             for(i=[0:num_steps-1]){
                 hull(){
-                    rotate([0,i*angle/num_steps,0]) rotate([0,0,90]) translate([(i+1)*drop/(num_steps+1),in/2+.1,0]) track_slice_2();
-                    rotate([0,(i+1)*angle/num_steps,0]) rotate([0,0,90]) translate([(i+2)*drop/(num_steps+1),in/2+.1,0]) track_slice_2();
+                    rotate([0,i*angle/num_steps,0]) rotate([0,0,90]) translate([(i+1)*drop/(num_steps+1),in/2+.01,0]) track_slice_2();
+                    rotate([0,(i+1)*angle/num_steps,0]) rotate([0,0,90]) translate([(i+2)*drop/(num_steps+1),in/2+.01,0]) track_slice_2();
                 }
             }
         }
         //inlet
         hull(){
-            rotate([0,0,90]) translate([0*drop/(num_steps+1),in/2+.1,extra_drop]) track_hollow_slice_2();
-            rotate([0,0,90]) translate([1*drop/(num_steps+1),in/2+.1,0]) track_hollow_slice_2();
+            rotate([0,0,90]) translate([0*drop/(num_steps+1),in/2+.01,extra_drop]) track_hollow_slice_2();
+            rotate([0,0,90]) translate([1*drop/(num_steps+1),in/2+.01,0]) track_hollow_slice_2();
         }
         
         //curved part
         for(i=[0:num_steps-1]){
             hull(){
-                rotate([0,i*angle/num_steps,0]) rotate([0,0,90]) translate([(i+1)*drop/(num_steps+1),in/2+.1,0]) track_hollow_slice_2();
-                rotate([0,(i+1)*angle/num_steps,0]) rotate([0,0,90]) translate([(i+2)*drop/(num_steps+1),in/2+.1,0]) track_hollow_slice_2();
+                rotate([0,i*angle/num_steps,0]) rotate([0,0,90]) translate([(i+1)*drop/(num_steps+1),in/2+.01,0]) track_hollow_slice_2();
+                rotate([0,(i+1)*angle/num_steps,0]) rotate([0,0,90]) translate([(i+2)*drop/(num_steps+1),in/2+.01,0]) track_hollow_slice_2();
             }
         }
     }
@@ -588,7 +588,7 @@ module d_slot(shaft=6, height=10, tolerance = .2, dflat=.25, $fn=30){
     }
 }
 
-module motorHoles(solid=1, motor_bump=4, support=false, slot=0){
+module motorHoles(solid=1, motor_bump=4, support=false, slot=0, top_rad = 3.1){
     %translate([0,37/2-12,-20.8/2]) cube([22.3,37,20.8], center=true);
     %translate([0,37-12,-20.8/2]) rotate([-90,0,0]) cylinder(r=22/2, h=28);
     
@@ -597,14 +597,14 @@ module motorHoles(solid=1, motor_bump=4, support=false, slot=0){
             mirror([0,0,1]) translate([0,0,(20.8)*1]) {
                 for(i=[0,1]) mirror([i,0,0]) translate([17.5/2,20,0]) {
                     //cylinder(r=3.3/2+wall, h=motor_bump);
-                    hull() for(j=[-slot/2, slot/2]) translate([j,0,0]) {
-                        cylinder(r1=3.1, r2=3.1+wall, h=motor_bump+.1);
-                        translate([0,0,motor_bump]) cylinder(r=3.1+wall, h=wall/2);
+                    #hull() for(j=[-slot/2, slot/2]) translate([j,0,0]) {
+                        cylinder(r1=top_rad, r2=top_rad+wall, h=motor_bump+.1);
+                        translate([0,0,motor_bump]) cylinder(r=top_rad+wall, h=wall/2);
                     }
                 }
                 if(support == true){
-                    translate([0,0,0]) cylinder(r1=3.1, r2=3.1+wall, h=motor_bump+.1);
-                    translate([0,0,motor_bump]) cylinder(r=3.1+wall, h=wall/2);
+                    translate([0,0,0]) cylinder(r1=top_rad, r2=top_rad+wall, h=motor_bump+.1);
+                    translate([0,0,motor_bump]) cylinder(r=top_rad+wall, h=wall/2);
                 }
             }
     }
@@ -618,16 +618,16 @@ module motorHoles(solid=1, motor_bump=4, support=false, slot=0){
             //translate([0,12,0]) cylinder(r=2.6, h=3.1);
             
             *hull() for(j=[-slot/2, slot/2]) translate([j,0,0]) {
-                cylinder(r1=3.1, r2=3.1+wall, h=motor_bump+.1);
-                translate([0,0,motor_bump]) cylinder(r=3.1+wall, h=wall/2);
+                cylinder(r1=3.2, r2=3.2+wall, h=motor_bump+.1);
+                translate([0,0,motor_bump]) cylinder(r=3.2+wall, h=wall/2);
                 }
        
             //mounting holes
             for(j=[0,1]) mirror([0,0,1]) translate([0,0,(20.8-2)*1]) for(i=[0,1]) mirror([i,0,0]) translate([17.5/2,20,0]) {
                 
-                hull() for(s=[-slot/2, slot/2]) translate([s,0,0]) cylinder(r=3.3/2, h=30);
-                translate([0,0,2.6]) hull() for(s=[-slot/2, slot/2]) translate([s,0,0]) cylinder(r1=3.3/2, r2=3.1, h=1.5);
-                translate([0,0,wall+1]) hull() for(s=[-slot/2, slot/2]) translate([s,0,0]) cylinder(r=3.1, h=20);
+                hull() for(s=[-slot/2, slot/2]) translate([s,0,0]) cylinder(r=3.4/2, h=30);
+                translate([0,0,2.6]) hull() for(s=[-slot/2, slot/2]) translate([s,0,0]) cylinder(r1=3.4/2, r2=3.2, h=1.5);
+                translate([0,0,wall+1]) hull() for(s=[-slot/2, slot/2]) translate([s,0,0]) cylinder(r=3.2, h=20);
             }
        }
    }       

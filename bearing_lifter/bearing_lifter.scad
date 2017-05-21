@@ -13,7 +13,7 @@ hole_rad = 8;
 lift_rad = in*3;
 num_balls = 17;
 
-part = 10;
+part = 0;
 
 //laid out for printing
 if(part == 0)
@@ -45,8 +45,8 @@ module assembled(){
     
     //bearing lifter
     translate([0,0,in*2]) bearing_inlet();
-    *translate([in*4.5,-in*1-1-ball_rad*2-wall,in*6]) rotate([90,0,0]) mirror([0,0,1]) rotate([0,0,30]) bearing();
-    *translate([in*4.5,-in*1-1-ball_rad*2-wall,in*6+1]) rotate([90,0,0]) bearing_fingergaurd();
+    translate([in*4.5,-in*1-1-ball_rad*2-wall,in*6]) rotate([90,0,0]) mirror([0,0,1]) rotate([0,0,30]) bearing();
+    translate([in*4.5,-in*1-1-ball_rad*2-wall,in*6+1]) rotate([90,0,0]) bearing_fingergaurd();
     translate([0,0,in*2]) bearing_outlet();
     
     //also need feet, pegs, and handle.
@@ -115,6 +115,11 @@ module gear_mockup(){
 
 //inlet ramp
 module bearing_inlet(){
+    slot = 8;
+    
+    motor_mount_height = 6.5;
+    motor_mount_lift = motor_mount_height-1.1-wall;
+    
     translate([0,0,in])
     difference(){
     union(){
@@ -125,16 +130,16 @@ module bearing_inlet(){
             
             //bearing mount
             translate([in*4.5,0,in*3]) rotate([90,0,0]){
-                translate([0,-10,0]) scale([2.7,2,1]) cylinder(r1=10, r2=9.5, h = in+1, $fn=6);
+                translate([0,-10,0]) scale([2.7,2,1]) cylinder(r1=10, r2=9.5, h = in+3, $fn=6);
                 translate([0,0,in-1]) cylinder(r1=hole_rad-slop*2, r2=hole_rad-slop*4, h = in*3/4-1, $fn=6);
             }
             
-            //motot mount
+            //motor mount
             //new motor mount - right angled beastie
            translate([in/2, -in, in*2+6]) rotate([90,0,0])  rotate([0,0,90]){
             
               %translate([0,0,1+ball_rad*2+wall/2+2]) rotate([0,0,8]) rotate([180,0,0]) bearing(bearing=false, drive_gear=true);
-              translate([0,0,-.1]) hull() rotate([0,0,-90]) motorHoles(1, slot=8);
+              translate([0,0,motor_mount_lift]) hull() rotate([0,0,-90]) motorHoles(1, motor_bump = motor_mount_height, slot=slot, support=true);
            }
                   
             hanger(solid=1, hole=[5,4], drop=in*3.4, rot=5);
@@ -152,7 +157,7 @@ module bearing_inlet(){
             
                         //new motor mount - right angled beastie
            translate([in/2, -in, in*2+6]) rotate([90,0,0])  rotate([0,0,90]){
-              rotate([0,0,-90]) motorHoles(0, slot=8);
+              translate([0,0,motor_mount_lift]) rotate([0,0,-90]) motorHoles(0, motor_bump = motor_mount_height, slot=slot);
            }
         
         hanger(solid=-1, hole=[5,4], drop=in*6.5);
@@ -201,11 +206,6 @@ module bearing_outlet(){
                     rotate([0,35-(1)*support_step,0]) translate([lift_rad-in*3/16,0,0]) rotate([90,0,0]) cylinder(r1=1+(0+1)/4, r2=2+(0+1)/2, h=in*.8);
                 }
             }
-        }
-        
-        *translate([in*6.5, -in+2-motor_bump, in*6.8+2.5]) rotate([90,0,0])  rotate([0,0,0]){
-            //bearing(bearing=false, drive_gear=true);
-            rotate([0,0,-90]) motorHoles(0, slot=2);
         }
         
         hanger(solid=-1, hole=[5,7]);
