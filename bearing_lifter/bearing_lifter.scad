@@ -13,7 +13,7 @@ hole_rad = 8;
 lift_rad = in*3;
 num_balls = 17;
 
-part = 0;
+part = 4;
 
 //laid out for printing
 if(part == 0)
@@ -25,7 +25,7 @@ if(part == 2)
 if(part == 3)
     rotate([270,0,0]) bearing_outlet();
 if(part == 4)
-    rotate([270,0,0]) screw_drop(inlet_length=2, height = 1.5);
+    rotate([270,0,0]) screw_drop(inlet_length=2, width=2, height = 1.5);
 if(part == 9)
     bearing_fingergaurd();
 
@@ -41,7 +41,7 @@ module assembled(){
     basic_panel();
     
     //frilly outlet
-    translate([in*8,0,peg_sep*6]) screw_drop(inlet_length=2, height = 1.5);
+    translate([in*8,0,peg_sep*6]) screw_drop(inlet_length=2, width=2, height = 1.5);
     
     //bearing lifter
     translate([0,0,in*2]) bearing_inlet();

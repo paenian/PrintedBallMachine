@@ -16,7 +16,7 @@ translate([peg_sep*3,0,-peg_sep*4])  reverse_module();
 translate([peg_sep*4,0,peg_sep])  reverse_module();
 
 //inlet ramp
-module screw_drop(inlet_length=1, exit=1, height = 2.5){
+module screw_drop(inlet_length=1, exit=1, height = 2.5, width=3){
     
     turns = floor(height);
     segments = turns*4+1+((exit==-1)?3:2);
@@ -30,7 +30,7 @@ module screw_drop(inlet_length=1, exit=1, height = 2.5){
     translate([0,0,in])
     difference(){
         union(){
-            inlet(height=1, length=inlet_length, hanger_height=1);
+            inlet(height=1, width=width, length=inlet_length, hanger_height=1);
         
             //prevents excess speed on the ball in
             translate([(inlet_length-1)*in,-wall,0]) hull(){
