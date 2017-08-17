@@ -399,8 +399,8 @@ module hanger(solid=0, hole=[1,4], slot_size = 0, drop = in/2, rot = 0){
     translate([in*hole[0]-peg_sep/2, 0, in*(hole[1]-1)]) 
     if(solid >= 0) union(){
         hull(){
-            translate([-slot_size/2,0,peg_sep/2]) rotate([90,0,0]) cylinder(r=peg_rad+wall*2, h=wall);
-            translate([slot_size/2,0,peg_sep/2]) rotate([90,0,0]) cylinder(r=peg_rad+wall*2, h=wall);
+            translate([-slot_size/2,0,peg_sep/2]) rotate([90,0,0]) cylinder(r=peg_sep/3, h=wall);
+            translate([slot_size/2,0,peg_sep/2]) rotate([90,0,0]) cylinder(r=peg_sep/3, h=wall);
                 
             rotate([0,rot,0]) translate([0,0,peg_sep/2-drop])rotate([90,0,0]) rotate([0,0,22.5]) cylinder(r=peg_rad+wall, h=wall, $fn=8);
         }

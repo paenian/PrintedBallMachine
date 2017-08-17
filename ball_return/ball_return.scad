@@ -109,11 +109,13 @@ module rear_ball_return_inlet(width=2){
     
     front_inset = 0;
     
-    inset = rear_gap/in-.25-.25-wall/in;    //for some reason I left this in inches.  bleck.
-    exit_offset = peg_thick+wall + rear_gap/2 + wall/2;
+    inset = rear_gap/in-.25-.25-wall/in-wall/in;    //for some reason I left this in inches.  bleck.
+    
+    
+    exit_offset = peg_thick+wall + rear_gap/2 + wall/2 - wall;
     dowel_lift = -in*.55;
     
-    translate([0,-wall,0])
+   
     difference(){
         union(){
             //inlet catcher - extends to the back, to deposit balls there.
@@ -121,15 +123,15 @@ module rear_ball_return_inlet(width=2){
             
             //base stiffener
             hull(){
-                #translate([in-.1,-(width)*in,0]) cube([wall,in*(width)+inset*in+in,in]);
-                #translate([in-.1,0,-in/2]) cube([wall,wall*2+in/4,in/4]);
+                translate([in-.1,-(width)*in,0]) cube([wall,in*(width)+inset*in+in,in]);
+                translate([in-.1,0,-in/2]) cube([wall,wall*2+in/4,in/4]);
             }
             
             //false bottom, to make a better channel
             translate([wall/4,-(width)*in,0]) cube([in,in*(1+width)+inset*in,wall*4.5]);
             
             //newfangled pegboard attachment system
-            pegboard_attach();
+            translate([0,-wall,0]) pegboard_attach();
             
             //%pegboard_attach_old();
 
@@ -193,20 +195,27 @@ module pegboard_attach_old(){
             }
 }
 
-module pegboard_attach(){
+module pegboard_attach(upper=false){
     //so we're going to use two holes, but the far one's a double-sided bump
-    wall = 3.25;
+    wall = wall+.25;
     bump = 3;
     difference(){
         translate([0,wall*1+peg_thick/2-1, 0]) 
-        for(i=[0,1]) mirror([0,i,0]) translate([0,wall*1+peg_thick/2,0]) {
+        for(i=[0,0]) mirror([0,i,0]) translate([0,wall*1+peg_thick/2,0]) {
             hull(){
-                hanger(solid=1, hole=[0,0], drop = in*2.5, rot=245, wall=wall);
-                hanger(solid=1, hole=[-1,0], drop = in*3.25, rot=240, wall=wall);
+                if(upper==false){
+                    //lower
+                    hanger(solid=1, hole=[0,0], drop = in*2.5, rot=245, wall=wall);
+                    hanger(solid=1, hole=[-1,0], drop = in*3.25, rot=240, wall=wall);
+                }else{
+                    //upper
+                    hanger(solid=1, hole=[0,1], drop = in*3.25, rot=260, wall=wall);
+                    hanger(solid=1, hole=[-1,1], drop = in*3.25, rot=245, wall=wall);
+                }
             }
             
             //bump
-            translate([-in*1.5,-wall,-in*.5]) hull(){
+            *translate([-in*1.5,-wall,-in*.5]) hull(){
                 translate([0,0,0]) scale([1,.8,1]) sphere(r=peg_rad+slop);
                 translate([0,-wall/4,0]) scale([.97,.5,.97]) sphere(r=peg_rad+slop);
                 translate([0,-bump/2,0]) scale([.8,.4,.8]) sphere(r=peg_rad+slop);
@@ -214,16 +223,24 @@ module pegboard_attach(){
         }
         
         //peg hole in the rear
-        translate([0,wall*1+peg_thick/2-1, 0]) for(i=[0,1]) mirror([0,i,0]) translate([0,wall*1+peg_thick/2,0])
-            hanger(solid=-1, hole=[0,0], wall=wall);
+        translate([0,wall*1+peg_thick/2-1, 0]) for(i=[0,1]) mirror([0,i,0]){
+            //lower
+            translate([0,wall*1+peg_thick/2,0]) hanger(solid=-1, hole=[0,0], wall=wall);
+            translate([0,wall*1+peg_thick/2,0]) hanger(solid=-1, hole=[-1,0], wall=wall);
+            
+            //upper
+                translate([0,wall*1+peg_thick/2,0]) hanger(solid=-1, hole=[0,1], wall=wall);
+                translate([0,wall*1+peg_thick/2,0]) hanger(solid=-1, hole=[-1,1], wall=wall);
+            
+        }
         
         //ball hole
         hull(){
             translate([in/2,-wall,in*.45]) sphere(r=ball_rad+wall);
-            translate([in/2,-wall,in*2]) sphere(r=ball_rad+wall);
+            //translate([in/2,-wall,in*2]) sphere(r=ball_rad+wall);
             
             translate([in/2,wall*2+peg_thick,in*.45]) sphere(r=ball_rad+wall);
-            translate([in/2,wall*2+peg_thick,in*2]) sphere(r=ball_rad+wall);
+            //translate([in/2,wall*2+peg_thick,in*2]) sphere(r=ball_rad+wall);
             
         }
     }
@@ -234,24 +251,24 @@ module rear_ball_return_outlet(){
     //inset = .75-.25-wall/in;
     front_inset = 0;
     
-    inset = rear_gap/in-.25-.25-wall/in;    //for some reason I left this in inches.  bleck.
-    exit_offset = peg_thick+wall + rear_gap/2 + wall/2;
+    inset = rear_gap/in-.25-.25-wall/in-wall/in;    //for some reason I left this in inches.  bleck.
+    exit_offset = peg_thick+wall + rear_gap/2 + wall/2 - wall;
     
     dowel_lift = -in*.75;
     
     //lower the inlet entirely - split the difference, basically
     extra_drop = in/4;
     
-    translate([0,-wall,0])
+    
     difference(){
         union(){
             //inlet catcher - extends to the back, to deposit balls there.
-            translate([0,in/2-wall*2-inset*in,0]) rotate([0,0,180]) inlet(length=1, hanger_height=0, outlet=REVERSE, height=1, width=2+inset, board_inset = inset*in);
+            translate([0,in/2-wall*2-inset*in-wall*2,0]) rotate([0,0,180]) inlet(length=1, hanger_height=0, outlet=REVERSE, height=1, width=2+inset, board_inset = inset*in);
             
             //stiffen the back a bit
             mirror([1,0,0]) hull(){
                 translate([in-.1,-1*in,0]) cube([wall,in*2+in*inset,in]);
-                translate([in-.1,0,-in/2+extra_drop]) cube([wall,wall*2+in/4,in/4]);
+                translate([in-.1,0,in/2+extra_drop+in/2]) cube([wall,wall*2+in/4,in/4]);
             }
             
             //false bottom, to make a better channel
@@ -259,7 +276,7 @@ module rear_ball_return_outlet(){
 
                    
             //attach it to the pegboard
-            translate([0,0,extra_drop]) mirror([1,0,0]) pegboard_attach();
+            translate([0,-wall,extra_drop]) mirror([1,0,0]) pegboard_attach(upper=true);
             
             //hold a couple dowels underneath, to run the balls to the outlet
             mirror([0,0,1]) translate([dowel_holder_height/2+1,exit_offset,dowel_lift]) dowel_holder();

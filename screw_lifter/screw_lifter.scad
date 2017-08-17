@@ -60,7 +60,7 @@ module assembled(){
     
     //ball return
     translate([in*12,0,in*7]) rear_ball_return_inlet();
-    translate([0,0,in*6]) rear_ball_return_outlet();
+    translate([0,0,in*5.75]) rear_ball_return_outlet();
 }
 
 module screw_outlet(){
@@ -210,7 +210,7 @@ module screw_inlet(){
             *rotate([0,60,0]) translate([0,0,-peg_sep]) cylinder(r=screw_rad+1, h=100);
         }
         
-        
+        #translate([peg_sep/2, 0, peg_sep/2]) rotate([90,0,0]) cylinder(r=peg_rad, h=peg_thick*3, center=true);
     }
 }
 

@@ -2,14 +2,14 @@ include<configuration.scad>
 use <pins.scad>
 use <base.scad>
 
-part = 1;
+part = 0;
 
 //laid out for printing
 if(part == 0)   //peg
-    push_peg();
+    rotate([-90,0,0]) push_peg();
 
 if(part == 1)  //peg lock
-    push_peg_handle();
+    rotate([-90,0,0]) push_peg_handle();
 
 cap_rad = .25*in;
 cap_height = 3.25;
