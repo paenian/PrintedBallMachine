@@ -4,7 +4,7 @@ use <../clank_drop/clank_drop.scad>;
 use <../screw_drop/bowl_drop.scad>;
 use <../ball_return/ball_return.scad>;
 
-part = 10;
+part = 0;
 
 screw_rad = ball_rad+wall*2;
 screw_pitch = ball_rad*2+wall*2;
@@ -114,6 +114,12 @@ module screw_inlet(){
         union(){
             inlet(length=3, inset=0, outlet=NONE, hanger_height=4);
             
+            //hanger array
+            for(i=[1:3])
+                for(j=[2:5])
+                    hanger(solid = 1, hole=[i,j], drop = (j-1)*in);
+                        
+            
             //strengthen the hangers
             difference(){
                 union(){
@@ -170,7 +176,12 @@ module screw_inlet(){
            }
                
            //cube cut
-           translate([100+in*4-1,0,100]) cube([200,200,200], center=true);
+           translate([100+in*3,0,100]) cube([200,200,300], center=true);
+           
+           //extra hanger holes to avoid hitting ball returns etc.
+            for(i=[1:3])
+                for(j=[2:5])
+                    hanger(solid = -1, hole=[i,j], drop = 0);
         
         
         //ball entry to the guides
@@ -209,8 +220,6 @@ module screw_inlet(){
             *rotate([0,30,0]) translate([0,0,-peg_sep]) cylinder(r=screw_rad+1, h=100);
             *rotate([0,60,0]) translate([0,0,-peg_sep]) cylinder(r=screw_rad+1, h=100);
         }
-        
-        #translate([peg_sep/2, 0, peg_sep/2]) rotate([90,0,0]) cylinder(r=peg_rad, h=peg_thick*3, center=true);
     }
 }
 
