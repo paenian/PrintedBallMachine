@@ -13,10 +13,15 @@ if(part == 1)  //peg lock
 
 cap_rad = .25*in;
 cap_height = 3.25;
-nub_height = .75; //increase for more lock; max=
-nub_length = 1.5; //increase to make the pegs easier to remove
-nub_inset = nub_length/2;
-gap_rad = (nub_height*2+1)/2;
+nub_height = 1; //increase for more lock; max=
+nub_length = 3; //increase to make the pegs easier to remove
+nub_inset = nub_length*.75;
+gap_rad = (nub_height*2+1.4)/2;
+
+%cube([4.6,5,5], center=true);
+%cube([gap_rad*2,7,4.5], center=true);
+echo("WALL=", 4.6-(gap_rad*2));
+
 
 lock_rad = m3_rad+.1;
 
@@ -69,8 +74,7 @@ module push_peg(){
             //nub
             intersection(){
                 union(){
-                    translate([0,0,nub_start]) cylinder(r1=peg_rad, r2=peg_rad+nub_height, h=nub_length);
-                    translate([0,0,nub_start+nub_length]) cylinder(r2=peg_rad, r1=peg_rad+nub_height, h=peg_length-nub_start-nub_length);
+                    translate([0,0,nub_start]) for(i=[0,1]) mirror([0,0,i]) translate([0,0,-i*nub_length*2]) cylinder(r1=peg_rad, r2=peg_rad+nub_height, h=nub_length);
                 }
                 
                 //this ensures that the tips of the nub can go through the hole when compressed.
@@ -81,9 +85,14 @@ module push_peg(){
         }
         
         //center hollow for pinching
-        hull(){
-            translate([0,0,wall]) rotate([90,0,0]) cylinder(r=gap_rad, h=20, center=true);
-            translate([0,0,peg_length]) rotate([90,0,0]) cylinder(r=gap_rad, h=20, center=true);
+        difference(){
+            hull(){
+                translate([0,0,wall]) rotate([90,0,0]) cylinder(r=gap_rad, h=20, center=true);
+                translate([0,0,peg_length]) rotate([90,0,0]) cylinder(r=gap_rad, h=20, center=true);
+            }
+            
+            //leave a little for the locking screw
+            for(i=[0,1]) mirror([i,0,0]) translate([10,0,peg_thick+wall-nub_inset+nub_length]) cylinder(r=10, h=wall/2, center=true, $fn=4);
         }
         
         //flatten the bottom for easy printing
