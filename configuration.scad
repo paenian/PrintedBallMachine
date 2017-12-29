@@ -8,6 +8,7 @@ slop = .2;
 peg_rad = 1/4*in/2;
 peg_sep = 1*in;
 peg_thick = 1/4*in;
+peg_cap_rad = .25*in;
 
 wall=3;
 

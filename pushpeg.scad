@@ -4,17 +4,25 @@ use <base.scad>
 
 in = 25.4;
 
-part = 10;
+part = 12;
 
 //laid out for printing
-if(part == 0)   //peg
-    rotate([-90,0,0]) push_peg();
-
-if(part == 1)  //peg lock
-    rotate([-90,0,0]) push_peg_handle();
-
-if(part == 2)  //peg stand
+if(part == 0)  //peg stand
     rotate([-90,0,0]) rotate([0,90,0]) push_peg_stand();
+
+if(part == 1)   //peg in TPU
+    rotate([-90,0,0]) push_peg(gap_rad = (nub_height*2)/2, peg_length = peg_thick*2+wall/2);
+
+if(part == 11)  //peg with handle in TPU
+    rotate([-90,0,0]) push_peg_handle(gap_rad = (nub_height*2)/2, peg_length = peg_thick*2+wall/2);
+
+if(part == 2)   //peg in PETG
+    rotate([-90,0,0]) push_peg(gap_rad = (nub_height*2+1.4)/2);
+
+if(part == 12)  //peg with handle in PETG
+    rotate([-90,0,0]) push_peg_handle(gap_rad = (nub_height*2+1.4)/2);
+
+
 
 if(part == 10){
     //TPU
@@ -23,7 +31,7 @@ if(part == 10){
     !translate([29,-20,0]) rotate([0,90,0]) push_peg_stand();
 }
 
-cap_rad = .25*in;
+cap_rad = peg_cap_rad;
 cap_height = 3.25;
 nub_height = 1.25; //increase for more lock; max=
 nub_length = 2.5; //increase to make the pegs easier to remove
@@ -44,13 +52,13 @@ echo(lock_rad);
 
 
 
-module push_peg_handle(){
+module push_peg_handle(gap_rad = gap_rad, peg_length = peg_thick*2+wall){
     handle_length = 13;
     handle_rad = peg_rad*1.5;
     
     difference(){
         union(){
-            push_peg();
+            push_peg(gap_rad = gap_rad, peg_length = peg_length);
             
             //easy pull handle
             minkowski(){
@@ -66,8 +74,7 @@ module push_peg_handle(){
     }
 }
 
-module push_peg(){
-    peg_length = peg_thick*2+wall;
+module push_peg(gap_rad = gap_rad, peg_length = peg_thick*2+wall){
     nub_start = peg_thick+wall-nub_inset;
     
     difference(){

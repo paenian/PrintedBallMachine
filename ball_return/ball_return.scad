@@ -4,7 +4,7 @@ use <../pins.scad>
 use <../peg.scad>
 use <../handle.scad>
 
-part = 3;
+part = 10;
 
 if(part == 0)
     rotate([0,90,0]) rear_ball_return_inlet();
@@ -13,16 +13,20 @@ if(part == 2)
     rotate([0,90,0]) rear_ball_return_inlet(width=3);
 
 if(part == 3)
-    translate([0,0,0]) rotate([0,270,0]) rear_ball_return_outlet();
+    translate([-in*1.5,0,0]) rotate([0,270,0]) rear_ball_return_outlet();
 
-if(part == 4)
+if(part == 1)
+    rotate([0,90,0]) rear_ball_return_inlet_180(width=3);
+
+if(part == 4)   //deprecated
     translate([0,0,peg_thick/2-slop]) rotate([90,0,0]) ball_return_peg();
 
-if(part == 5)
+if(part == 5)   //probably shouldn't use :-)
     translate([0,0,peg_thick/2-slop]) rotate([0,90,0]) ball_return_joint();
 
 if(part == 10){
-   basic_panel();
+    basic_panel();
+    translate([in*12,in+peg_thick*2,0]) rotate([0,0,180]) basic_panel();
 }
 
 module basic_panel(){
@@ -30,11 +34,11 @@ module basic_panel(){
         pegboard([12,12]);
 
         //ball return
-        translate([in*12,0,in*5]) rear_ball_return_inlet();
-        translate([0,0,in*4]) rear_ball_return_outlet();
+        translate([in*12,0,in*5]) rear_ball_return_inlet_180();
+        //translate([0,0,in*4]) rear_ball_return_outlet();
         
         //feet
-        translate([peg_sep*11, 0, peg_sep]) peg_stand();
+        translate([peg_sep*10, 0, peg_sep]) peg_stand();
         translate([peg_sep,0,peg_sep]) mirror([1,0,0]) peg_stand();
         
         //handle
@@ -104,15 +108,19 @@ module ball_return_peg(){
     }
 }
 
-module rear_ball_return_inlet(width=2){
+module rear_ball_return_inlet_180(width=3){
+    rear_ball_return_inlet(dowel = false, exit_extend = in, extra_attach=true);
+}
+
+module rear_ball_return_inlet(width=2, dowel = true, exit_extend = 0, extra_attach=false){
     %translate([0,in/4+wall,0]) cube([rear_gap,rear_gap,rear_gap]);
     
     front_inset = 0;
     
-    inset = rear_gap/in-.25-.25-wall/in-wall/in;    //for some reason I left this in inches.  bleck.
+    inset = rear_gap/in-.25-.25-wall/in-wall/in+exit_extend/in;    //for some reason I left this in inches.  bleck.
     
     
-    exit_offset = peg_thick+wall + rear_gap/2 + wall/2 - wall;
+    exit_offset = peg_thick+wall + rear_gap/2 + wall/2 - wall + exit_extend;
     dowel_lift = -in*.55;
     
    
@@ -133,11 +141,16 @@ module rear_ball_return_inlet(width=2){
             //newfangled pegboard attachment system
             translate([0,-wall,0]) pegboard_attach();
             
+            if(extra_attach == true){
+                translate([0,exit_extend-peg_thick-wall,0]) pegboard_attach();
+            }
+            
             //%pegboard_attach_old();
 
             
             //hold a couple dowels underneath, to run the balls to the outlet
-            translate([0, exit_offset, dowel_lift]) dowel_holder();
+            if(dowel == true)
+                translate([0, exit_offset, dowel_lift]) dowel_holder();
         }
         
         //channel in the false bottom
@@ -156,13 +169,14 @@ module rear_ball_return_inlet(width=2){
         }
        
         //dowel holes
-        translate([0,exit_offset,dowel_lift]) dowel_holes(flare_len = dowel_holder_height/3);
+        if(dowel == true)
+            translate([0,exit_offset,dowel_lift]) dowel_holes(flare_len = dowel_holder_height/3);
         
         //flatten the far side for printing on
         translate([100+in+wall/2,0,0]) cube([200,200,200], center=true);
         
         //flatten the back side so it sits flush with the handle mounts
-        translate([0,100+peg_thick+wall+rear_gap,0]) cube([200,200,200], center=true);
+        translate([0,100+peg_thick+wall+rear_gap+exit_extend,0]) cube([200,200,200], center=true);
     }
 }
 
@@ -197,21 +211,22 @@ module pegboard_attach_old(){
 
 module pegboard_attach(upper=false){
     //so we're going to use two holes, but the far one's a double-sided bump
-    wall = wall+.25;
+    reg_wall = wall;
+    wall = wall+1.25;
     bump = 3;
     difference(){
         translate([0,wall*1+peg_thick/2-1, 0]) 
         for(i=[0,0]) mirror([0,i,0]) translate([0,wall*1+peg_thick/2,0]) {
             hull(){
-                if(upper==false){
+                //if(upper==false){
                     //lower
                     hanger(solid=1, hole=[0,0], drop = in*2.5, rot=245, wall=wall);
                     hanger(solid=1, hole=[-1,0], drop = in*3.25, rot=240, wall=wall);
-                }else{
+                //}else{
                     //upper
                     hanger(solid=1, hole=[0,1], drop = in*3.25, rot=260, wall=wall);
                     hanger(solid=1, hole=[-1,1], drop = in*3.25, rot=245, wall=wall);
-                }
+                //}
             }
             
             //bump
@@ -223,14 +238,14 @@ module pegboard_attach(upper=false){
         }
         
         //peg hole in the rear
-        translate([0,wall*1+peg_thick/2-1, 0]) for(i=[0,1]) mirror([0,i,0]){
+        translate([0,wall*1+peg_thick/2-1, 0]) {
             //lower
-            translate([0,wall*1+peg_thick/2,0]) hanger(solid=-1, hole=[0,0], wall=wall);
-            translate([0,wall*1+peg_thick/2,0]) hanger(solid=-1, hole=[-1,0], wall=wall);
+            translate([0,reg_wall*1+peg_thick/2,0]) hanger(solid=-1, hole=[0,0]);
+            translate([0,reg_wall*1+peg_thick/2,0]) hanger(solid=-1, hole=[-1,0]);
             
             //upper
-                translate([0,wall*1+peg_thick/2,0]) hanger(solid=-1, hole=[0,1], wall=wall);
-                translate([0,wall*1+peg_thick/2,0]) hanger(solid=-1, hole=[-1,1], wall=wall);
+                translate([0,reg_wall*1+peg_thick/2,0]) hanger(solid=-1, hole=[0,1]);
+                translate([0,reg_wall*1+peg_thick/2,0]) hanger(solid=-1, hole=[-1,1]);
             
         }
         

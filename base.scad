@@ -14,7 +14,7 @@ slope_module();
 *inlet_switch();
 *switch();
 
-!default_panel();
+default_panel();
 
 //this module angles to the other side, acts as a brake to slow down long runs.
 //rotate([-90,0,0])
@@ -23,7 +23,7 @@ union(){
     slope_module(size=[5,-1.5]);
 }
 
-inlet(height=2, width=2, length=1, outlet=INLET_SLOT, hanger_height=1);//, inset=0);
+!inlet(height=2, width=2, length=1, outlet=INLET_HOLE, hanger_height=1);//, inset=0);
 
 
 *translate([in*10,0,-in*2]) 
@@ -183,7 +183,7 @@ module inlet(height = 1, width = 3, length = 1, hanger_height=1, lift=5, outlet=
             hull(){
                 cube([inlet_x,inlet_y,.1]);
                 translate([0,0,inlet_z-drop_top]) rotate([0,-lift_angle,0]) cube([inlet_x+inset,inlet_y,.1]);
-                #translate([inlet_x-wall,inlet_y-wall,inlet_z+lift]) cube([wall,wall,.1]);
+                translate([inlet_x-wall,inlet_y-wall,inlet_z+lift]) cube([wall,wall,.1]);
                 //%translate([0,0,inlet_z-.1]) cube([inlet_x,inlet_y,.1]);
             }
             for(i=[0:length-1]){
@@ -202,12 +202,12 @@ module inlet(height = 1, width = 3, length = 1, hanger_height=1, lift=5, outlet=
                     if(outlet == REVERSE){
                         hull(){
                             translate([0,inlet_y-in/2,in/2]) translate([0,0,0]) sphere(r=in/2-wall);
-                            translate([-inlet_x,inlet_y-in/2,in/2+5*length]) translate([0,0,0]) sphere(r=ball_rad);
+                            translate([0,inlet_y-in/2,in*3/4]) translate([0,0,0]) sphere(r=ball_rad);
                         }
                     }else{
                         hull(){
                             translate([inlet_x,inlet_y-in/2,in/2]) translate([0,0,0]) sphere(r=in/2-wall);
-                            translate([-inlet_x,inlet_y-in/2,in/2+5*length]) translate([0,0,0]) sphere(r=ball_rad);
+                            translate([0,inlet_y-in/2,in*3/4]) translate([0,0,0]) sphere(r=ball_rad);
                         }
                     }
                     hull(){
@@ -218,13 +218,15 @@ module inlet(height = 1, width = 3, length = 1, hanger_height=1, lift=5, outlet=
                 }
                 
                 //this is the main body
-                translate([wall,wall,wall*2.5]) cube([inlet_x-wall*2,inlet_y-wall*2,.1]);
+                translate([wall,wall,wall*3]) cube([inlet_x-wall*2,inlet_y-wall*2,.1]);
                 translate([0,wall,inlet_z+lift+.1]) rotate([0,-lift_angle,0])  translate([wall,0,0]) cube([inlet_x+inset-wall*2,inlet_y-wall*2,.1]);
             }
             
             //wall supports
-            for(i=[1:length-1]){
-                translate([i*in,0,0]) rotate([30,0,0]) translate([0,0,in/4]) cube([wall/2, in+2*i,in+2*i], center=true);
+            if(length >= 2){
+                for(i=[1:length-1]){
+                    translate([i*in,0,0]) rotate([30,0,0]) translate([0,0,in/4]) cube([wall/2, in+2*i,in+2*i], center=true);
+                }
             }
         }
 
@@ -393,7 +395,7 @@ module inlet_switch(height = 1, width = 3, inlet_length = 2, left_length = 3, ri
 }
 
 //used to hang everything :-)
-module hanger(solid=0, hole=[1,4], slot_size = 0, drop = in/2, rot = 0){
+module hanger(solid=0, hole=[1,4], slot_size = 0, drop = in/2, rot = 0, chamfer_offset = .25){
     offset = (track_rad+wall);
     
     translate([in*hole[0]-peg_sep/2, 0, in*(hole[1]-1)]) 
@@ -408,10 +410,22 @@ module hanger(solid=0, hole=[1,4], slot_size = 0, drop = in/2, rot = 0){
     
     translate([in*hole[0]-peg_sep/2, 0, in*(hole[1]-1)]) 
     if(solid <= 0) union(){
-        for(i=[0:1]) hull(){
-            translate([-slot_size/2,0,peg_sep/2]) rotate([90,0,0]) translate([0,0,wall/2]) mirror([0,0,i]) translate([0,0,-.05]) cylinder(r1=peg_rad+slop, r2=peg_rad+wall+wall, h=wall*2);
-            translate([slot_size/2,0,peg_sep/2]) rotate([90,0,0]) translate([0,0,wall/2]) mirror([0,0,i]) translate([0,0,-.05]) cylinder(r1=peg_rad+slop, r2=peg_rad+wall+wall, h=wall*2);
+        for(i=[0:1]){
+            //chamfer
+            hull() for(j=[0:1]) mirror([j,0,0]) {
+                translate([slot_size/2,0,peg_sep/2]) rotate([90,0,0]) translate([0,0,wall/2]) mirror([0,0,i]) translate([0,0,chamfer_offset]) cylinder(r1=peg_rad+slop, r2=peg_rad+wall+wall, h=wall*2);
+            }
+            //center bore
+            hull() for(j=[0:1]) mirror([j,0,0]) {
+                translate([slot_size/2,0,peg_sep/2]) rotate([90,0,0]) translate([0,0,wall/2]) mirror([0,0,i]) translate([0,0,-.1]) cylinder(r=peg_rad+slop, h=wall*2);
+            }
+            
+            //cap area, in case of thicker walls
+            hull() for(j=[0:1]) mirror([j,0,0]) {
+                translate([slot_size/2,0,peg_sep/2]) rotate([90,0,0]) translate([0,0,wall/2]) mirror([0,0,i]) translate([0,0,wall/2-.1]) cylinder(r=peg_cap_rad+slop*2, h=wall*2);
+            }
         }
+        //cut out t
     }
 }
 
