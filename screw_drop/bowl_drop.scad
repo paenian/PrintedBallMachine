@@ -22,11 +22,14 @@ if(part == 2)
 if(part == 3)
     rotate([0,270,0]) bowl_drop_outlet(extend=3);
 
+if(part == 4)
+    rotate([0,270,0]) shallow_bowl_drop(inlet_length=6, height = 2-.125, rad=3.5, height_scale=.55*in-.191*in, lower=11.3+4.8);
+
 if(part == 10){
     //this requres a special collector.
-    translate([peg_sep*6,0,peg_sep*4]) bowl_drop(inlet_length=6, height = 2-.125, rad=3.5, height_scale=.55*in-.191*in, lower=11.3+4.8);
+    translate([peg_sep*7,0,peg_sep*4]) shallow_bowl_drop(inlet_length=5, height = 2-.125, rad=2.5);
     
-    translate([0,0,peg_sep*4]) bowl_drop_inlet(length=5);
+    translate([0,0,peg_sep*4]) bowl_drop_inlet(length=6);
     
     translate([peg_sep*9,0,peg_sep*2]) bowl_drop_outlet(extend=3);
 }
@@ -69,6 +72,23 @@ module bowl_drop_outlet(extend=3){
     }
 }
 
+module shallow_bowl_drop(inlet_length=2, inlet_width=3, height = 2.5, rad = 1.5){
+    
+    sphere_rad = rad*in;
+    sphere_scale = height/rad*in;
+    
+    
+    translate([0,0,in])
+    difference(){
+        union(){
+            inlet(height=1, length=inlet_length, width=inlet_width, hanger_height=1, outlet=NONE);
+            intersection(){
+                translate([sphere_rad,-sphere_rad,0]) scale([1,1,1]) sphere(r=sphere_rad);
+            }
+        }
+    }
+}
+
 module bowl_drop(inlet_length=2, inlet_width=3, height = 2.5, rad = 1.5, height_scale = in, lower = -.2){ 
     
     //height_scale = in*3/4;
@@ -94,8 +114,6 @@ module bowl_drop(inlet_length=2, inlet_width=3, height = 2.5, rad = 1.5, height_
             translate([in*rad,-in*rad,in+wall*2-1-lower]) rotate([0,90,0]) horn(.2, 11.25, [height_scale, in*rad, in*rad]);
             
         }
-        
-
         
         //inner cone
         translate([in*rad,-in*rad,in+wall*2-.9-lower]) rotate([0,90,0]) horn(.2, 11.25, [height_scale, in*rad-wall*2, in*rad-wall*3]);

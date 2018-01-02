@@ -4,7 +4,7 @@ use <../pins.scad>
 use <../peg.scad>
 use <../handle.scad>
 
-part = 10;
+part = 1;
 
 if(part == 0)
     rotate([0,90,0]) rear_ball_return_inlet();
@@ -109,7 +109,7 @@ module ball_return_peg(){
 }
 
 module rear_ball_return_inlet_180(width=3){
-    rear_ball_return_inlet(dowel = false, exit_extend = in, extra_attach=true);
+    rear_ball_return_inlet(dowel = false, exit_extend = in*1.5, extra_attach=true);
 }
 
 module rear_ball_return_inlet(width=2, dowel = true, exit_extend = 0, extra_attach=false){

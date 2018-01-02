@@ -4,14 +4,14 @@ use <base.scad>
 
 in = 25.4;
 
-part = 12;
+part = 1;
 
 //laid out for printing
 if(part == 0)  //peg stand
     rotate([-90,0,0]) rotate([0,90,0]) push_peg_stand();
 
 if(part == 1)   //peg in TPU
-    rotate([-90,0,0]) push_peg(gap_rad = (nub_height*2)/2, peg_length = peg_thick*2+wall/2);
+    rotate([-90,0,0]) push_peg(nub_height = 1.25, gap_rad = 1.2, peg_length = peg_thick*2+wall/2);
 
 if(part == 11)  //peg with handle in TPU
     rotate([-90,0,0]) push_peg_handle(gap_rad = (nub_height*2)/2, peg_length = peg_thick*2+wall/2);
@@ -28,7 +28,7 @@ if(part == 10){
     //TPU
     rotate([-90,0,0]) push_peg();
     translate([11,4,0]) rotate([-90,0,0]) push_peg_handle();
-    !translate([29,-20,0]) rotate([0,90,0]) push_peg_stand();
+    *translate([29,-20,0]) rotate([0,90,0]) push_peg_stand();
 }
 
 cap_rad = peg_cap_rad;
@@ -96,8 +96,8 @@ module push_peg(gap_rad = gap_rad, peg_length = peg_thick*2+wall){
                 }
                 
                 //this ensures that the tips of the nub can go through the hole when compressed.
-                hull(){
-                    for(i=[0,1]) mirror([i,0,0]) translate([gap_rad*.5,0,0]) cylinder(r=peg_rad, h=peg_length);
+                #hull(){
+                    for(i=[0,1]) mirror([i,0,0]) translate([gap_rad*.5+.1,0,0]) cylinder(r=peg_rad, h=peg_length);
                 }
             }
         }
