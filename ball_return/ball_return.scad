@@ -4,10 +4,13 @@ use <../pins.scad>
 use <../peg.scad>
 use <../handle.scad>
 
-part = 1;
+part = 6;
 
 if(part == 0)
     rotate([0,90,0]) rear_ball_return_inlet();
+
+if(part == 1)
+    rotate([0,90,0]) rear_ball_return_inlet_180(width=3);
 
 if(part == 2)
     rotate([0,90,0]) rear_ball_return_inlet(width=3);
@@ -15,14 +18,14 @@ if(part == 2)
 if(part == 3)
     translate([-in*1.5,0,0]) rotate([0,270,0]) rear_ball_return_outlet();
 
-if(part == 1)
-    rotate([0,90,0]) rear_ball_return_inlet_180(width=3);
-
 if(part == 4)   //deprecated
     translate([0,0,peg_thick/2-slop]) rotate([90,0,0]) ball_return_peg();
 
 if(part == 5)   //probably shouldn't use :-)
     translate([0,0,peg_thick/2-slop]) rotate([0,90,0]) ball_return_joint();
+
+if(part == 6)
+    rotate([0,90,0]) rear_ball_return_inlet_90(width=3);
 
 if(part == 10){
     basic_panel();
@@ -108,11 +111,15 @@ module ball_return_peg(){
     }
 }
 
+module rear_ball_return_inlet_90(width=3){
+    rear_ball_return_inlet(dowel = false, exit_extend = -in, extra_attach=false, 90_attach=true, straight_exit=true);
+}
+
 module rear_ball_return_inlet_180(width=3){
     rear_ball_return_inlet(dowel = false, exit_extend = in*1.5, extra_attach=true);
 }
 
-module rear_ball_return_inlet(width=2, dowel = true, exit_extend = 0, extra_attach=false){
+module rear_ball_return_inlet(width=2, dowel = true, exit_extend = 0, extra_attach=false, 90_attach=false, straight_exit=false){
     %translate([0,in/4+wall,0]) cube([rear_gap,rear_gap,rear_gap]);
     
     front_inset = 0;
@@ -120,7 +127,7 @@ module rear_ball_return_inlet(width=2, dowel = true, exit_extend = 0, extra_atta
     inset = rear_gap/in-.25-.25-wall/in-wall/in+exit_extend/in;    //for some reason I left this in inches.  bleck.
     
     
-    exit_offset = peg_thick+wall + rear_gap/2 + wall/2 - wall + exit_extend;
+    exit_offset = peg_thick+wall + rear_gap/2 + wall/2 - wall + exit_extend+wall-1;
     dowel_lift = -in*.55;
     
    
@@ -156,9 +163,17 @@ module rear_ball_return_inlet(width=2, dowel = true, exit_extend = 0, extra_atta
         //channel in the false bottom
         union(){
                 //exit slope
-                hull(){
-                    translate([in/2,exit_offset,in-wall*3]) sphere(r=ball_rad+wall);
-                    translate([-in/2,exit_offset,in-wall*4.25]) sphere(r=ball_rad+wall/2);
+                if(straight_exit == false){
+                    hull(){
+                        translate([in/2,exit_offset,in-wall*3]) sphere(r=ball_rad+wall);
+                        translate([-in/2,exit_offset,in-wall*4.25]) sphere(r=ball_rad+wall/2);
+                    }
+                }else{
+                    hull(){
+                        //go straight!
+                        translate([in/2,exit_offset,in-wall*3]) sphere(r=ball_rad+wall);
+                        translate([in/2,exit_offset+in,in-wall*4.25]) sphere(r=ball_rad+wall/2);
+                    }
                 }
                 
                 //horizontal slope
