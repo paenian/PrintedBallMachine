@@ -4,17 +4,17 @@ use <base.scad>
 
 in = 25.4;
 
-part = 1;
+part = 11;
 
 //laid out for printing
 if(part == 0)  //peg stand
     rotate([-90,0,0]) rotate([0,90,0]) push_peg_stand();
 
 if(part == 1)   //peg in TPU
-    rotate([-90,0,0]) push_peg(nub_height = 1.25, gap_rad = 1.2, peg_length = peg_thick*2+wall/2);
+    rotate([-90,0,0]) push_peg(nub_height = 1.25, gap_rad = 1.15, peg_length = peg_thick*2+wall/2);
 
 if(part == 11)  //peg with handle in TPU
-    rotate([-90,0,0]) push_peg_handle(gap_rad = (nub_height*2)/2, peg_length = peg_thick*2+wall/2);
+    rotate([-90,0,0]) push_peg_handle(nub_height = 1.25, gap_rad = 1.15, peg_length = peg_thick*2+wall/2);
 
 if(part == 2)   //peg in PETG
     rotate([-90,0,0]) push_peg(gap_rad = (nub_height*2+1.4)/2);
@@ -34,7 +34,7 @@ if(part == 10){
 cap_rad = peg_cap_rad;
 cap_height = 3.25;
 nub_height = 1.25; //increase for more lock; max=
-nub_length = 2.5; //increase to make the pegs easier to remove
+nub_length = 1.5; //increase to make the pegs easier to remove
 nub_inset = nub_length*.666;
 gap_rad = (nub_height*2)/2;
 
@@ -53,7 +53,7 @@ echo(lock_rad);
 
 
 module push_peg_handle(gap_rad = gap_rad, peg_length = peg_thick*2+wall){
-    handle_length = 13;
+    handle_length = 11;
     handle_rad = peg_rad*1.5;
     
     difference(){
@@ -68,6 +68,9 @@ module push_peg_handle(gap_rad = gap_rad, peg_length = peg_thick*2+wall){
                 }
             }
         }
+        
+        //hole for a screw to lock it in place
+        cylinder(r1=lock_rad, r2=lock_rad-.5, h=peg_length*2, center=true, $fn=8);
         
         //flatten the bottom again
         translate([0,25+peg_rad-peg_flat,0]) cube([50,50,50], center=true);
@@ -120,7 +123,7 @@ module push_peg(gap_rad = gap_rad, peg_length = peg_thick*2+wall){
         translate([0,-1*(25+peg_rad-peg_flat),25]) cube([50,50,50], center=true);
         
         //hole for a locking peg
-        cylinder(r1=lock_rad, r2=lock_rad-.25, h=peg_length*2, center=true, $fn=8);
+        cylinder(r1=lock_rad, r2=lock_rad-.5, h=peg_length*2, center=true, $fn=8);
     }
 }
 

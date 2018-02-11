@@ -114,12 +114,6 @@ module screw_inlet(){
         union(){
             inlet(length=3, inset=0, outlet=NONE, hanger_height=4);
             
-            //hanger array
-            for(i=[1:3])
-                for(j=[2:5])
-                    hanger(solid = 1, hole=[i,j], drop = (j-1)*in);
-                        
-            
             //strengthen the hangers
             difference(){
                 union(){

@@ -260,6 +260,11 @@ module inlet(height = 1, width = 3, length = 1, hanger_height=1, lift=5, outlet=
             translate([-in/2,inlet_y-i,inlet_z-in/2-.35]) track(rise=-1.5, run=17, solid=-1, track_rad=track_rad+.35);
             
         }
+        
+        //extra inlet holes
+        for(i=[0:length-1]){
+            translate([i*inlet_x/length,inlet_y,-in+inlet_z])
+            hanger(solid=-1, hole=[1,1+hanger_height], drop =(hanger_height)*in);  }
     }
 }
 
@@ -410,10 +415,11 @@ module hanger(solid=0, hole=[1,4], slot_size = 0, drop = in/2, rot = 0, chamfer_
     
     translate([in*hole[0]-peg_sep/2, 0, in*(hole[1]-1)]) 
     if(solid <= 0) union(){
+        for(j=[0:1:ceil(drop/in)]) translate([0,0,-in*j])
         for(i=[0:1]){
             //chamfer
             hull() for(j=[0:1]) mirror([j,0,0]) {
-                translate([slot_size/2,0,peg_sep/2]) rotate([90,0,0]) translate([0,0,wall/2]) mirror([0,0,i]) translate([0,0,chamfer_offset]) cylinder(r1=peg_rad+slop, r2=peg_rad+wall+wall, h=wall*2);
+                translate([slot_size/2,0,peg_sep/2]) rotate([90,0,0]) translate([0,0,wall/2]) mirror([0,0,i]) translate([0,0,chamfer_offset]) cylinder(r1=peg_rad-slop, r2=peg_rad+wall+wall, h=wall*2);
             }
             //center bore
             hull() for(j=[0:1]) mirror([j,0,0]) {

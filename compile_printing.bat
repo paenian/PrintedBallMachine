@@ -22,7 +22,3 @@ openscad -o parts/ball_return_inlet_3.stl -D part=2 ball_return/ball_return.scad
 openscad -o parts/ball_return_outlet.stl -D part=3 ball_return/ball_return.scad &
 openscad -o parts/ball_return_joint.stl -D part=5 ball_return/ball_return.scad &
 
-#in progress: ball return to another module, back to back
-
-
-#todo: ball return to another module, 90 degree angle

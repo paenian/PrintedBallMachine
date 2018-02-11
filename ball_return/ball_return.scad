@@ -25,7 +25,10 @@ if(part == 5)   //probably shouldn't use :-)
     translate([0,0,peg_thick/2-slop]) rotate([0,90,0]) ball_return_joint();
 
 if(part == 6)
-    rotate([0,90,0]) rear_ball_return_inlet_90(width=3);
+    difference(){
+        translate([0,0,11]) rotate([0,35,0]) rear_ball_return_inlet_90(width=3);
+        translate([0,0,-100]) cube([200,200,200], center=true);
+    }
 
 if(part == 10){
     basic_panel();
@@ -112,14 +115,14 @@ module ball_return_peg(){
 }
 
 module rear_ball_return_inlet_90(width=3){
-    rear_ball_return_inlet(dowel = false, exit_extend = -in, extra_attach=false, 90_attach=true, straight_exit=true);
+    rear_ball_return_inlet(dowel = false, exit_extend = -in-wall, extra_attach=false, 90_attach=true, straight_exit=true, inlet_length = 1.25);
 }
 
 module rear_ball_return_inlet_180(width=3){
     rear_ball_return_inlet(dowel = false, exit_extend = in*1.5, extra_attach=true);
 }
 
-module rear_ball_return_inlet(width=2, dowel = true, exit_extend = 0, extra_attach=false, 90_attach=false, straight_exit=false){
+module rear_ball_return_inlet(width=2, dowel = true, exit_extend = 0, extra_attach=false, 90_attach=false, straight_exit=false, inlet_length=1){
     %translate([0,in/4+wall,0]) cube([rear_gap,rear_gap,rear_gap]);
     
     front_inset = 0;
@@ -134,7 +137,8 @@ module rear_ball_return_inlet(width=2, dowel = true, exit_extend = 0, extra_atta
     difference(){
         union(){
             //inlet catcher - extends to the back, to deposit balls there.
-            inlet(length=1, hanger_height=0, outlet=REVERSE, height=1, width=1+width+inset, board_inset = in+inset*in);
+            translate([in * (1-inlet_length),0,0]) inlet(length=inlet_length, hanger_height=0, outlet=REVERSE, height=1, width=1+width+inset, board_inset = in+inset*in);
+            
             
             //base stiffener
             hull(){
@@ -143,13 +147,25 @@ module rear_ball_return_inlet(width=2, dowel = true, exit_extend = 0, extra_atta
             }
             
             //false bottom, to make a better channel
-            translate([wall/4,-(width)*in,0]) cube([in,in*(1+width)+inset*in,wall*4.5]);
+            translate([wall/2+in * (1-inlet_length),-(width)*in,0]) cube([inlet_length*in,in*(1+width)+inset*in,wall*4.5]);
             
             //newfangled pegboard attachment system
-            translate([0,-wall,0]) pegboard_attach();
+            if(90_attach == false){
+                translate([0,-wall,0]) pegboard_attach();
+            }else{
+                %translate([-in/2-peg_thick,in,0]) cube([in, in, in], center=true);
+                translate([-peg_thick-wall/2,-wall,0]) pegboard_attach();
+            }
             
             if(extra_attach == true){
                 translate([0,exit_extend-peg_thick-wall,0]) pegboard_attach();
+            }
+            
+            if(90_attach == true){
+                intersection(){
+                    translate([in/2-peg_thick-wall,in/2,0]) rotate([0,0,90]) mirror([1,0,0]) pegboard_attach();
+                    translate([-in/2,in*2,0]) cube([in*2, in*3.45, in*3], center=true);
+                }
             }
             
             //%pegboard_attach_old();
@@ -179,7 +195,7 @@ module rear_ball_return_inlet(width=2, dowel = true, exit_extend = 0, extra_atta
                 //horizontal slope
                 hull(){
                     translate([in/2,exit_offset,in-wall*3]) sphere(r=ball_rad+wall);
-                    translate([in/2,-in*(width-.5),in-wall]) sphere(r=ball_rad+wall);
+                    translate([in/2-((inlet_length-1)/2)*in,-in*(width-.5),in-wall]) sphere(r=ball_rad+wall);
                 }
         }
        
@@ -188,10 +204,14 @@ module rear_ball_return_inlet(width=2, dowel = true, exit_extend = 0, extra_atta
             translate([0,exit_offset,dowel_lift]) dowel_holes(flare_len = dowel_holder_height/3);
         
         //flatten the far side for printing on
-        translate([100+in+wall/2,0,0]) cube([200,200,200], center=true);
+        translate([100+peg_thick+wall/2+20,0,0]) cube([200,200,200], center=true);
         
         //flatten the back side so it sits flush with the handle mounts
-        translate([0,100+peg_thick+wall+rear_gap+exit_extend,0]) cube([200,200,200], center=true);
+        if(90_attach == false){
+            translate([0,100+peg_thick+wall+rear_gap+exit_extend,0]) cube([200,200,200], center=true);
+        }else{
+            
+        }
     }
 }
 
