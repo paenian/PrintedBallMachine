@@ -12,8 +12,19 @@ motor_mount_rad = 38/2;
 m3_rad = 1.7;
 m3_nut_rad = 3.5;
 
-assembled();
+part = 3;
 
+if(part == 10)
+    assembled();
+
+if(part == 1)
+    rotate([-90,0,0]) stair_inlet();
+
+if(part == 2)
+    rotate([90,0,0]) moving_stair();
+
+if(part == 3)
+    cam();
 
 //stair variables
 stair_length = 6*in;
@@ -160,8 +171,8 @@ module motor_mount(solid = 1){
         }
     }
 }
-    cam_rad = 61;
-    cam_scale = .37;
+    cam_rad = 63;
+    cam_scale = .31;
 
 module moving_stair(step_lift = in){
     //travel maximums
@@ -217,9 +228,12 @@ module fixed_stair(step_lift = in, extra_width = 5){
         for(i=[0:num_steps-1]){
             //stair step cutouts
             translate([step_length*i, 0, step_lift*i]) stair_step(solid = -1, entrance = i+1, exit = i-num_steps+2);
-            
+        }
+        
+        for(i=[0:(num_steps*step_length)/in+1]){
+            echo(i);
             //stair hangers
-            hanger(hole=[ceil((step_length*i)/in),num_steps+1], solid=-1, drop=in*(num_steps-i));
+            hanger(hole=[ceil(i),num_steps+1], solid=-1, drop=in*(num_steps));
         }
         
         motor_mount(solid = -1);

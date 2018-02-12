@@ -22,3 +22,7 @@ openscad -o parts/ball_return_inlet_3.stl -D part=2 ball_return/ball_return.scad
 openscad -o parts/ball_return_outlet.stl -D part=3 ball_return/ball_return.scad &
 openscad -o parts/ball_return_joint.stl -D part=5 ball_return/ball_return.scad &
 
+#connector returns
+openscad -o parts/ball_return_180.stl -D part=1 ball_return/ball_return.scad &
+openscad -o parts/ball_return_90.stl -D part=6 ball_return/ball_return.scad &
+
