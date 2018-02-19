@@ -14,6 +14,10 @@ slope_module();
 *inlet_switch();
 *switch();
 
+
+!wide_slope_module(size = [4, -.2], width=3);
+
+
 default_panel();
 
 //this module angles to the other side, acts as a brake to slow down long runs.
@@ -23,7 +27,7 @@ union(){
     slope_module(size=[5,-1.5]);
 }
 
-!inlet(height=2, width=2, length=1, outlet=INLET_HOLE, hanger_height=1);//, inset=0);
+inlet(height=2, width=2, length=1, outlet=INLET_HOLE, hanger_height=1);//, inset=0);
 
 
 *translate([in*10,0,-in*2]) 
@@ -77,6 +81,51 @@ module slope_module(size = [4, -.5], width=3, inlet = NORMAL){
 		  translate([50+in*size[0]+in-1,0,in*2]) cube([100,100,100], center=true);
         
          hanger(solid=-1, hole=[floor(size[0])+1,3], drop = in/2);
+    }
+}
+
+//A sample module which uses the inlet to roll balls down a wide, rolly chute
+module wide_slope_module(size = [4, -.5], width=3){
+    height = 3;
+    difference(){
+        union(){
+            inlet(height=height, width=width);
+            //beefy bottom for more slopey
+            translate([0,-in*width,in*2]) cube([in,in*width,in*.55]);
+            
+            %translate([in*1.45, -in/2, in*2.5]) sphere(r=ball_rad+wall/2);
+            
+            //flapper to kick it downslope
+            intersection(){
+                translate([in+ball_rad*2+wall*2.5, -in*1.25, in*2]) rotate([0,0,5]) cube([wall, in*1.25, in]);
+                hull() translate([in,0,in*2]) scale([1,width,1]) track(rise=(size[1]*1.1)*in, run=(size[0]*1.1)*in, solid=1, end_angle=0);
+            }   
+            
+            translate([in,0,in*2]) scale([1,width,1]) track(rise=(size[1]*1.1)*in, run=(size[0]*1.1)*in, solid=1, end_angle=0);
+            
+            hanger(solid=1, hole=[floor(size[0])+1,3], drop = -size[1]*in+in);
+            hanger(solid=1, hole=[1,4], drop = -size[1]*in+in*2);
+        }
+        //inlet exit
+        hull(){
+            translate([in/2, -in/2, (height-.2)*in]) sphere(r=ball_rad+wall/2);
+            translate([in*1.5, -in/2, (height-.3)*in]) sphere(r=ball_rad+wall/2);
+        }
+        
+        hull(){
+            translate([in/2, -in/2, (height-.2)*in]) sphere(r=ball_rad+wall/2);
+            translate([in/2, -width*in+in/2, (height-.1)*in]) sphere(r=ball_rad+wall/2);
+        }
+
+          //cut the end flat
+          translate([100+in*size[0]+in-1,0,in*2]) cube([200,200,200], center=true);
+        
+         //hanger(solid=-1, hole=[floor(size[0])+1,3], drop = in/2);
+        
+        for(i=[2:1:4]){
+            hanger(solid=-1, hole=[floor(size[0])+1,i], drop = -size[1]*in+in);
+            hanger(solid=-1, hole=[1,i], drop = -size[1]*in+in*2);
+        }
     }
 }
 

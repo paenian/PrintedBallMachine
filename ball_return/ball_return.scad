@@ -4,13 +4,15 @@ use <../pins.scad>
 use <../peg.scad>
 use <../handle.scad>
 
-part = 6;
+part = 1;
 
 if(part == 0)
     rotate([0,90,0]) rear_ball_return_inlet();
 
-if(part == 1)
-    rotate([0,90,0]) rear_ball_return_inlet_180(width=3);
+if(part == 1) difference(){
+    rotate([0,45,0]) rear_ball_return_inlet_180(width=3);
+    translate([0,0,-150-11]) cube([300,300,300], center=true);
+}
 
 if(part == 2)
     rotate([0,90,0]) rear_ball_return_inlet(width=3);
@@ -115,11 +117,11 @@ module ball_return_peg(){
 }
 
 module rear_ball_return_inlet_90(width=3){
-    rear_ball_return_inlet(dowel = false, exit_extend = -in-wall, extra_attach=false, 90_attach=true, straight_exit=true, inlet_length = 1.25);
+    rear_ball_return_inlet(width=width, dowel = false, exit_extend = -in-wall, extra_attach=false, 90_attach=true, straight_exit=true, inlet_length = 1.25);
 }
 
 module rear_ball_return_inlet_180(width=3){
-    rear_ball_return_inlet(dowel = false, exit_extend = in*1.5, extra_attach=true);
+    rear_ball_return_inlet(width=width, dowel = false, exit_extend = in*1.5, extra_attach=true);
 }
 
 module rear_ball_return_inlet(width=2, dowel = true, exit_extend = 0, extra_attach=false, 90_attach=false, straight_exit=false, inlet_length=1){

@@ -12,7 +12,7 @@ motor_mount_rad = 38/2;
 m3_rad = 1.7;
 m3_nut_rad = 3.5;
 
-part = 3;
+part = 10;
 
 if(part == 10)
     assembled();
@@ -34,6 +34,8 @@ step_length = stair_length/num_steps;
 step_width = in-wall;
 step_height = in*1.5;
     
+cam_rad = 59;
+cam_scale = .37;
 
 module assembled(){
     %pegboard([12,12]);
@@ -49,7 +51,8 @@ module assembled(){
     translate([in*5,0,in*6]) {
         stair_inlet();
     
-        translate([0,-5,0]) moving_stair();
+        translate([0,-5.5,-1]) moving_stair();
+        //translate([0,-5.5,-45]) moving_stair();
         
         translate([num_steps*step_length/2+step_length/2+in, -in, -in/2]) rotate([90,0,0]) cam();
     }
@@ -67,9 +70,9 @@ module stair_inlet(){
 }
 
 //need a rail with a tolerance, so we can inset it.
-module rail(solid = 1){
-    rail_width = 6;
-    rail_thick = 3;
+module rail(solid = 1, step_extra=0){
+    rail_width = 9;
+    rail_thick = 5;
     jut = 1;
     
     rad = (solid==1)?.5:1;
@@ -77,21 +80,21 @@ module rail(solid = 1){
     //a jut out bit to lower friction
     if(solid == 1) for(i=[step_length*.25, step_length*.75]){
         
-        translate([i-rail_width/2,-step_width-jut,0])
-        cube([rail_width,jut*2,step_height]);
+        translate([i-rail_width/2,-step_width-jut,-step_extra])
+        cube([rail_width,jut*2,step_height+step_extra]);
     }
     
     //the rail itself - a triangle made of cylinders.
     if(solid == 1){
-        for(i=[step_length*.75, step_length*.75]) translate([i,-step_width,0])
+        for(i=[step_length*.75]) translate([i,-step_width,-step_extra])
         hull(){
-            cylinder(r=rad, h=step_height);
-            for(i=[-rail_width/2, rail_width/2]) translate([i, -rail_thick,0]) cylinder(r=rad, h=step_height);
+            cylinder(r=rad, h=step_height+step_extra);
+            for(i=[-rail_width/2, rail_width/2]) translate([i, -rail_thick,0]) cylinder(r=rad, h=step_height+step_extra);
         }
     }
     
     if(solid == 0){
-        for(i=[step_length*.25, step_length*.25]) translate([i,-step_width-jut-.1,0])
+        for(i=[step_length*.25]) translate([i,-step_width-jut-.1,0])
         hull(){
             cylinder(r=rad, h=step_height*3, center=true);
             for(i=[-rail_width/2, rail_width/2]) translate([i, rail_thick,0]) cylinder(r=rad, h=step_height*3, center=true);
@@ -99,16 +102,16 @@ module rail(solid = 1){
     }
 }
 
-module stair_step(solid = 1, entrance = 0, exit = 0, rail_solid = 1){
+module stair_step(solid = 1, entrance = 0, exit = 0, rail_solid = 1, step_extra = 0){
     rear = step_length*.25;
     front = step_length*.75;
     
     if(solid == 1){
         //the step
-        translate([0,-step_width,0]) cube([step_length, step_width, step_height]);
+        translate([0,-step_width,-step_extra]) cube([step_length, step_width, step_height+step_extra]);
         
         //Rails to guide the sliding parts
-        if(rail_solid == 1) rail(rail_solid, step_width = step_width);
+        if(rail_solid == 1) rail(rail_solid, step_width = step_width, step_extra = step_extra);
     }
     
     if(solid == -1){
@@ -171,8 +174,7 @@ module motor_mount(solid = 1){
         }
     }
 }
-    cam_rad = 63;
-    cam_scale = .31;
+
 
 module moving_stair(step_lift = in){
     //travel maximums
@@ -213,7 +215,7 @@ module fixed_stair(step_lift = in, extra_width = 5){
         union(){
             for(i=[0:num_steps-1]){
                 //stair steps
-                translate([step_length*i, 0, step_lift*i]) stair_step(solid = 1, step_width = step_width+extra_width);
+                translate([step_length*i, 0, step_lift*i]) stair_step(solid = 1, step_width = step_width+extra_width, step_extra = 5);
                 
                 echo(floor((step_length*i)/in));
                 //stair hangers
@@ -233,7 +235,7 @@ module fixed_stair(step_lift = in, extra_width = 5){
         for(i=[0:(num_steps*step_length)/in+1]){
             echo(i);
             //stair hangers
-            hanger(hole=[ceil(i),num_steps+1], solid=-1, drop=in*(num_steps));
+            hanger(hole=[ceil(i),num_steps+1], solid=-1, drop=in*(num_steps-1));
         }
         
         motor_mount(solid = -1);
@@ -320,7 +322,7 @@ module cam(){
     difference(){
         union(){
             //collar
-            collar(radius=6, height=collar_height, pitch=12.7, teeth=6);
+            collar(radius=8, height=collar_height, pitch=12.7, teeth=6);
             scale([1,cam_scale,1]) cylinder(r=cam_rad, h=cam_height, $fn=90);
             %rotate([0,0,90]) scale([1,cam_scale,1]) cylinder(r=cam_rad, h=cam_height);
         }
