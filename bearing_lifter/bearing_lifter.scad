@@ -13,7 +13,7 @@ hole_rad = 8;
 lift_rad = in*3;
 num_balls = 17;
 
-part = 4;
+part = 2;
 
 //laid out for printing
 if(part == 0)
@@ -25,7 +25,7 @@ if(part == 2)
 if(part == 3)
     rotate([270,0,0]) bearing_outlet();
 if(part == 4)
-    rotate([270,0,0]) screw_drop(inlet_length=2, width=2, height = 1.5);
+    rotate([270,0,0]) screw_drop(inlet_length=2, width=2, height = 1.45);
 if(part == 9)
     bearing_fingergaurd();
 
@@ -142,12 +142,12 @@ module bearing_inlet(){
               translate([0,0,motor_mount_lift]) hull() rotate([0,0,-90]) motorHoles(1, motor_bump = motor_mount_height, slot=slot, support=true);
            }
                   
-            hanger(solid=1, hole=[5,4], drop=in*3.4, rot=5);
-            hanger(solid=1, hole=[4,4], drop=in*3.5, rot =-15);
-            hanger(solid=1, hole=[6,4], drop=in*3.7, rot = 25);
+            hanger(solid=1, hole=[5,4], drop=in*3.2, rot=0);
+            hanger(solid=1, hole=[4,4], drop=in*3.1, rot =0);
+            hanger(solid=1, hole=[6,4], drop=in*3.75, rot = 37);
            
             //hanger(solid=1, hole=[0,4], drop=in*3.5, rot =-20);
-            hanger(solid=1, hole=[2,5], drop=in*3.5, rot = 11);
+            hanger(solid=1, hole=[2,5], drop=in*3.9, rot = 0);
             
         }
         
@@ -167,7 +167,7 @@ module bearing_inlet(){
         //hanger(solid=-1, hole=[1,2], drop=in*6.5);
            
         //hanger(solid=-1, hole=[0,5], drop=in*3.5, rot =-20);
-        hanger(solid=-1, hole=[2,5], drop=in*3.5, rot = 20);
+        hanger(solid=-1, hole=[2,5], drop=in*3.9, rot = 0);
     }
 }
 
@@ -193,7 +193,7 @@ module bearing_outlet(){
             
             //hangers
             hanger(solid=1, hole=[5,7], drop=in, rot=-20);
-            hanger(solid=1, hole=[8,6], drop=in*.5, rot=-10);
+            hanger(solid=1, hole=[8,7], drop=in*1.5, rot=0);
             
             //this prevents the balls from rolling out prematurely
             translate([in*4.5,0,in*3]) {
@@ -208,8 +208,30 @@ module bearing_outlet(){
             }
         }
         
-        hanger(solid=-1, hole=[5,7]);
-        hanger(solid=-1, hole=[8,6]);
+        hanger(solid=-1, hole=[5,7], drop=in-1);
+        hanger(solid=-1, hole=[8,7], drop=in*1.5);
+    }
+}
+
+module d_slot(shaft=6, height=10, tolerance = .2, dflat=.25, double_d=false, round_inset=3, round_height=5, round_rad=3.25/2){
+    translate([0,0,-.1]){
+       difference(){ 
+           cylinder(r=shaft/2+tolerance, h=height+.01);
+           translate([-shaft/2,shaft/2-dflat,0]) cube([shaft, shaft, height+.01]);
+           if(double_d==true){
+               mirror([0,1,0]) translate([-shaft/2,shaft/2-dflat,0]) cube([shaft, shaft, height+.01]);
+           }
+           
+           //this is the rounded inset, for securing the gear
+           difference(){
+               cylinder(r=shaft/2+tolerance*2, h=round_inset+round_height);
+               
+               //now the screwhole
+               translate([0,0,-.1]) cylinder(r=round_rad*2, h=round_inset+.15);
+               translate([0,0,round_inset]) cylinder(r1=round_rad*2, r2=round_rad, h=round_rad+.1);
+               translate([0,0,round_inset+round_rad]) cylinder(r=round_rad, h=height);
+           }
+       }
     }
 }
 
@@ -259,11 +281,17 @@ module bearing(bearing=true, drive_gear=false){
                     //%cylinder(r=18, h=40);
                     herringbone(9,pitch,P,DR,tol,helix_angle,T);
                     //little bump on top
-                    translate([0,0,motor_bump/2]) cylinder(r=motor_shaft, h=T+motor_bump, center=true);
+                    translate([0,0,motor_bump]) cylinder(r=motor_shaft, h=T+motor_bump, center=true);
                 }
             
                 //d shaft
-                translate([0,0,-30]) d_slot(shaft=motor_shaft, height=60, dflat=motor_dflat);
+                //translate([0,0,-30]) d_slot(shaft=motor_shaft, height=60, dflat=motor_dflat);
+                
+                d_height = T;
+                round_inset = 12.5;
+                round_height = 20-4.75-round_inset;
+                round_rad = 3.25/2;
+                translate([0,0,-T/2-.2]) d_slot(shaft=7.1, height=d_height+round_height+round_inset, dflat=.625, double_d=true, round_inset=round_inset, round_height=round_height, round_rad=round_rad);
             }
         }
     

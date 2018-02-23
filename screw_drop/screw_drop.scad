@@ -12,7 +12,7 @@ dflat=.2;
 screw_drop(height = 2.55);
 translate([peg_sep*3,0,-peg_sep*4])  reverse_module();
 
-!translate([0,0,peg_sep*4]) screw_drop(inlet_length=2, height = 1.5);
+!translate([0,0,peg_sep*4]) screw_drop(inlet_length=2, height = 1.45);
 translate([peg_sep*4,0,peg_sep])  reverse_module();
 
 //inlet ramp
@@ -76,10 +76,10 @@ module screw_drop(inlet_length=1, exit=1, height = 2.5, width=3){
                     
                 }
             }
-            hanger(solid=1, hole=[2+inlet_length,2], drop=in*(1.1+turns), rot=10);
+            hanger(solid=1, hole=[2+inlet_length,2], drop=in*(1.1+turns), rot=0);
         }
         
-        hanger(solid=-1, hole=[2+inlet_length,2]);
+        hanger(solid=-1, hole=[2+inlet_length,2], drop=in*(1.1+turns));
         
         //the back isn't quite flat
         translate([peg_sep*2,100,0]) cube([200,200,200], center=true);

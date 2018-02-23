@@ -1,43 +1,49 @@
 include<configuration.scad>
 use <pins.scad>
+%pegboard(size = [12,12]);
 
-//%translate([0,0,-in*4]) pegboard([12,12]);
+part = 6;
 
-//simple slope!
-//rotate([-90,0,0])
-*translate([in*10,0,-in*4]) 
-mirror([1,0,0])
-offset_slope_module(offset=2);
-*translate([in*5,0,-in*1]) 
-slope_module();
+//bare inlet
+if(part == 0)
+    inlet();
 
-*inlet_switch();
-*switch();
+if(part == 1)
+    inlet(length=2);
+
+if(part == 2)
+    inlet(length=3);
+
+if(part == 3)
+    slope_module(size = [2, -.45]);
+
+if(part == 4)
+    slope_module(size = [3, -.45]);
+
+if(part == 5)
+    slope_module(size = [4, -.45]);
+
+if(part == 6)
+    slope_module(size = [5, -.45]);
+
+if(part == 7)
+    offset_slope_module(size = [3, -.45]);
+
+if(part == 8)
+    offset_slope_module(size = [4, -.45]);
+
+if(part == 9)
+    offset_slope_module(size = [5, -.45]);
+
+if(part == 10)
+    wide_slope_module(size = [4, -.45]);
+
+if(part == 11)
+    wide_slope_module(size = [5, -.45]);
 
 
-!wide_slope_module(size = [4, -.2], width=3);
-
-
-default_panel();
-
-//this module angles to the other side, acts as a brake to slow down long runs.
-//rotate([-90,0,0])
-union(){
-    %translate([0,0,-in*4]) pegboard([12,12]);
-    slope_module(size=[5,-1.5]);
-}
-
-inlet(height=2, width=2, length=1, outlet=INLET_HOLE, hanger_height=1);//, inset=0);
-
-
-*translate([in*10,0,-in*2]) 
-rotate([-90,0,0])
-reverse_module();
-
-*intersection(){
-    rotate([-90,0,0]) inlet(length=4, outlet=NONE);
-    rotate([-90,0,0]) translate([in*4,0,0]) mirror([1,0,0]) inlet(length=4);
-}
+if(part == 0)
+    demo_panel();
 
 //the size is the X and Y number of holes in the peg board.
 //This is meant to be used as a visual reference when designing your module.
@@ -52,7 +58,7 @@ module pegboard(size = [12,6]){
     }
 }
 
-module default_panel(){
+module demo_panel(){
     union(){
         pegboard(size = [12,12]);
         translate([-peg_sep*4,0, peg_sep*4]) slope_module(size = [3,-.5]);
@@ -80,7 +86,7 @@ module slope_module(size = [4, -.5], width=3, inlet = NORMAL){
 		  //cut the end flat
 		  translate([50+in*size[0]+in-1,0,in*2]) cube([100,100,100], center=true);
         
-         hanger(solid=-1, hole=[floor(size[0])+1,3], drop = in/2);
+         #hanger(solid=-1, hole=[floor(size[0])+1,3], drop = in/2);
     }
 }
 
@@ -464,7 +470,7 @@ module hanger(solid=0, hole=[1,4], slot_size = 0, drop = in/2, rot = 0, chamfer_
     
     translate([in*hole[0]-peg_sep/2, 0, in*(hole[1]-1)]) 
     if(solid <= 0) union(){
-        for(j=[0:1:ceil(drop/in)]) translate([0,0,-in*j])
+        for(j=[0:1:floor(drop/in)]) translate([0,0,-in*j])
         for(i=[0:1]){
             //chamfer
             hull() for(j=[0:1]) mirror([j,0,0]) {
@@ -647,12 +653,34 @@ module track(rise=-in, run=in*5, z_out=0, solid=1, track_angle=120, start=0, end
 }
 
 /********** Just a couple useful functions **********/
-module d_slot(shaft=6, height=10, tolerance = .2, dflat=.25, $fn=30){
+module d_slot_old(shaft=6, height=10, tolerance = .2, dflat=.25, $fn=30){
     translate([0,0,-.1]){
        difference(){ 
            cylinder(r1=shaft/2+tolerance, r2=shaft/2+tolerance/2, h=height+.01);
            translate([-shaft/2,shaft/2-dflat,0]) cube([shaft, shaft, height+.01]);
            translate([-shaft/2,-shaft/2-shaft+dflat,0]) cube([shaft, shaft, height+.01]);
+       }
+    }
+}
+
+module d_slot(shaft=6, height=10, tolerance = .2, dflat=.25, double_d=false, round_inset=3, round_height=5, round_rad=3.25/2){
+    translate([0,0,-.1]){
+       difference(){ 
+           cylinder(r=shaft/2+tolerance, h=height+.01);
+           translate([-shaft/2,shaft/2-dflat,0]) cube([shaft, shaft, height+.01]);
+           if(double_d==true){
+               mirror([0,1,0]) translate([-shaft/2,shaft/2-dflat,0]) cube([shaft, shaft, height+.01]);
+           }
+           
+           //this is the rounded inset, for securing the gear
+           difference(){
+               cylinder(r=shaft/2+tolerance*2, h=round_inset+round_height);
+               
+               //now the screwhole
+               translate([0,0,-.1]) cylinder(r=round_rad*2, h=round_inset+.15);
+               translate([0,0,round_inset]) cylinder(r1=round_rad*2, r2=round_rad, h=round_rad+.1);
+               translate([0,0,round_inset+round_rad]) cylinder(r=round_rad, h=height);
+           }
        }
     }
 }

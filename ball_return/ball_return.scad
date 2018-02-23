@@ -1,10 +1,10 @@
 include<../configuration.scad>
 use <../base.scad> 
 use <../pins.scad>
-use <../peg.scad>
+use <../pushpeg.scad>
 use <../handle.scad>
 
-part = 1;
+part = 7;
 
 if(part == 0)
     rotate([0,90,0]) rear_ball_return_inlet();
@@ -31,6 +31,9 @@ if(part == 6)
         translate([0,0,11]) rotate([0,35,0]) rear_ball_return_inlet_90(width=3);
         translate([0,0,-100]) cube([200,200,200], center=true);
     }
+    
+if(part == 7)
+    straight_link();
 
 if(part == 10){
     basic_panel();
@@ -46,11 +49,30 @@ module basic_panel(){
         //translate([0,0,in*4]) rear_ball_return_outlet();
         
         //feet
-        translate([peg_sep*10, 0, peg_sep]) peg_stand();
-        translate([peg_sep,0,peg_sep]) mirror([1,0,0]) peg_stand();
+        translate([peg_sep*10.5, 0, peg_sep*2.75]) push_peg_stand();
+        translate([peg_sep/2,0,peg_sep*2.75]) mirror([1,0,0]) push_peg_stand();
         
         //handle
         translate([peg_sep*5.5,0,peg_sep*12.525]) rotate([270,0,0]) mirror([0,0,1]) translate([0,0,-peg_thick]) handle();
+    }
+}
+
+//along with a binder clip this attaches two bits of pegboard together.
+module straight_link(size = [4,2]){
+    union(){
+        //back plate
+        hull() for(i=[1:size[0]]) for(j=[1:size[1]]) translate([peg_sep*i,peg_sep*j,0]) cylinder(r=peg_rad*3, h=wall);
+            
+        //central ridge
+        if(size[0] % 2 == 0){
+            translate([(peg_sep*(size[0]+1))/2,(peg_sep*(size[1]+1))/2,wall]) rotate([90,0,0]) scale([1/3,1,1]) cylinder(r=1, h=(size[1]-1)*in+peg_rad*6, center=true, $fn=6);
+        }
+        
+        //peg knobs
+        for(i=[1:size[0]]) for(j=[1:size[1]]) translate([peg_sep*i,peg_sep*j,0]) {
+            cylinder(r=peg_rad, h=wall+peg_thick-peg_rad/3);
+            translate([0,0,wall+peg_thick-peg_rad/3]) scale([1,1,2/3]) sphere(r=peg_rad);
+        }
     }
 }
 

@@ -4,7 +4,7 @@ use <base.scad>
 
 in = 25.4;
 
-part = 11;
+part = 0;
 
 //laid out for printing
 if(part == 0)  //peg stand
