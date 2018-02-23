@@ -1,17 +1,24 @@
-# PrintedBallMachine
-A 3d Printed ball machine, hung on pegboard.
+The PrintedBallMachine!
 
-The goal of this repo is to demonstrate the specifications of a printed ball machine, composed of interchangeable modules.
+Herein are some tips for working with the printed ball machine - making your own modules, first, and later making your own parts.
 
-Therefore, the biggest component is the ruleset.
+# Rough Idea
+The PBM is a marble machine that utilized pegboard for its vertical structure.  In order to make modular units, the pegboard is cut into 12" sections, with defined inlet and exit for linking together.  The machines are standardized on 5/8" steel ball bearings, because steel is satisfying.  This is the same size as the common glass marble, however there is much more variation in marbles than there are in ball bearings.
 
-The inlet hopper is given as a standalone STL, for use with other graphics programs, as well as the outlets.
+The Printed Ball Machine is designed in [OpenSCAD](http://www.openscad.org/), the programmer's solid modeler.
 
-Marbles are 5/8" steel ball bearings.  Steel is heavy.
+# Common Parts
+* Pegboard - 1" holes, 1/4" thick.  This is the 'heavy duty' pegboard, usually just brown hardboard.  Thinner stuff works, but not as well.  Generally sold in 2 foot by 4 foot sections - for modules, cut to 12" square.  Available at Home Depot/Lowes type stores - and they'll cut it if you ask nicely.
+  * [home depot](https://www.homedepot.com/p/Triton-1-4-in-x-1-8-in-Heavy-Duty-Brown-Pegboard-Wall-Organizer-Set-of-4-TPB-4BR/205196091)
+* 5/8" Steel Ball Bearings - I get mine from McMaster Carr, but anything'll work.
+* Pololu plastic gear motors - I standardized on this motor because it fits nicely in a 1" space, has a right-angle drive and decent torque, plus runs off 5v easily.
+  * [Pololu Plastic Gearmotor](https://www.pololu.com/product/1120)
+  * You can get less-geared versions for faster motors, too.
+* USB Charger and Cables
+  * The motors are nominally 6v, but run fine (a little slower) at 5v - so we cut up old or cheap USB cables to power them.
+  * You can also buy USB splitters, to minimize the number of chargers needed - two motors per amp is safe, in practice 4 seems to work fine.
+  * M3x12mm flat-head screws - two to hold each motor on.
+  * 12" x 3/8" wooden dowels - to make a single-module with ball recirculation.
 
-Inlets align on the 1" marks, outlets on the 1/2"; your machine may raise or lower marbles by any 1" increment.  The centerline for all inlets and outlets is 1" from the start of the hanger.
-
-The easiest module is the simple slope, which is included.  I'll be working on a lifter or two next, and will continue to add modules.
-
-Paul
-
+# Getting Started
+To get started, you need a pegboard, a motor or two, and a 3D printer. To make life easier, we've broken the parts into modules - 12"x12" units that can be linked together.  A module is not complete; it requires the addition of feet and a ball return option - either wooden dowels to recirculate around the back, straight peg clamps to attach it to another adjacent module, 180 degree ball returns to mate it to a second module behind it or 90 degree ball returns to turn it into a square.
