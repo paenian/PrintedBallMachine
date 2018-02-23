@@ -12,7 +12,7 @@ motor_mount_rad = 38/2;
 m3_rad = 1.7;
 m3_nut_rad = 3.5;
 
-part = 10;
+part = 3;
 
 if(part == 10)
     assembled();
@@ -307,12 +307,12 @@ module d_slot(shaft=6, height=10, tolerance = .2, dflat=.25, double_d=false, rou
 
 module cam(){
     cam_height = ball_rad/2+1;
-    collar_height = cam_height+4.5; 
+    collar_height = cam_height+4.5+1; 
     
-    d_height =4.5;
+    d_height = 5.25;
     
-    round_inset=0;
-    round_height= 4;
+    round_inset=2.5;
+    round_height= 5.7-round_inset;
     round_rad=3.25/2;
     
     echo("round_height");
@@ -328,6 +328,6 @@ module cam(){
         }
         
         //cut out the D shaft, and a screw fastener.
-        d_slot(shaft=7, height=20, dflat=.7, double_d=true, round_inset=round_inset, round_height=round_height, round_rad=round_rad);
+        d_slot(shaft=7.1, height=d_height+round_height+round_inset, dflat=.625, double_d=true, round_inset=round_inset, round_height=round_height, round_rad=round_rad);
     }
 }
