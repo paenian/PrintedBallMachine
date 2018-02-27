@@ -223,7 +223,7 @@ module screw_inlet(){
         %translate([in*1.45, -in*1.5, in*1.75]) sphere(r=ball_rad);
         
         //testing: cut the whole thing in half
-        translate([0,-in*1.5-100,100]) cube([200,200,300], center=true);
+        //translate([0,-in*1.5-100,100]) cube([200,200,300], center=true);
     }
 }
 
