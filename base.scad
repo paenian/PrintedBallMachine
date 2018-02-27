@@ -694,14 +694,14 @@ module motorHoles(solid=1, motor_bump=4, support=false, slot=0, top_rad = 3.1){
             mirror([0,0,1]) translate([0,0,(20.8)*1]) {
                 for(i=[0,1]) mirror([i,0,0]) translate([17.5/2,20,0]) {
                     //cylinder(r=3.3/2+wall, h=motor_bump);
-                    #hull() for(j=[-slot/2, slot/2]) translate([j,0,0]) {
+                    hull() for(j=[-slot/2, slot/2]) translate([j,0,0]) {
                         cylinder(r1=top_rad, r2=top_rad+wall, h=motor_bump+.1);
                         translate([0,0,motor_bump]) cylinder(r=top_rad+wall, h=wall/2);
                     }
                 }
                 if(support == true){
-                    translate([0,0,0]) cylinder(r1=top_rad, r2=top_rad+wall, h=motor_bump+.1);
-                    translate([0,0,motor_bump]) cylinder(r=top_rad+wall, h=wall/2);
+                    #translate([0,10,0]) cylinder(r1=top_rad, r2=top_rad+wall, h=motor_bump+.1);
+                    #translate([0,10,motor_bump]) cylinder(r=top_rad+wall, h=wall/2);
                 }
             }
     }

@@ -4,7 +4,7 @@ use <../clank_drop/clank_drop.scad>;
 use <../screw_drop/bowl_drop.scad>;
 use <../ball_return/ball_return.scad>;
 
-part = 4;
+part = 0;
 
 screw_rad = ball_rad+wall*2;
 screw_pitch = ball_rad*2+wall*2;
@@ -16,7 +16,7 @@ screw_length = 4.8;
 if(part == 0)
     screw_inlet();
 if(part == 1)
-    screw_segment(length=screw_length, starts=2, top=ROUND);
+    screw_segment_2(length=screw_length, starts=2, top=ROUND);
 if(part == 2)
     screw_segment(length=screw_length, starts=1, top=ROUND);
 if(part == 3)
@@ -127,6 +127,8 @@ module screw_inlet(){
             //motor hangs under the inlet, with an adustable angle centered on the hole in the floor.
             %translate([peg_sep*2,screw_offset,0]) rotate([0,-90+angle,0]) rotate([0,90,0]) rotate([0,0,-90]) translate([0,0,-21]) motor_holes();
             
+
+            
             //guide track
            translate([in*2,in/2+screw_offset,0]) for(i=[0,1]) mirror([i,0,0]) rotate([0,0,open_angle]) translate([screw_rad+ball_rad+wall*1.5,0,0]) rotate([0,-90,0]) track(rise = 0, run = in*(4.25+i*.125));
             
@@ -163,7 +165,7 @@ module screw_inlet(){
         translate([peg_sep*2,in/2+screw_offset-.75,in*4-back_drop*2]) mirror([1,1,0]) track(rise=-back_drop*2, run=in*2, solid=1, end_angle=90, solid=-1);
         
         //guide track hollow
-        translate([in*2,screw_offset,wall*2]) hull() for(i=[0,1]) mirror([i,0,0]) rotate([0,0,open_angle]) translate([screw_rad-2.3,0,0]) {
+        translate([in*2,screw_offset,wall*4]) hull() for(i=[0,1]) mirror([i,0,0]) rotate([0,0,open_angle]) translate([screw_rad-1.5,0,0]) scale([1,.9,1]) {
                //track(rise = 0, run = in*4.5, solid=-1);
                cylinder(r=ball_rad+wall, h=in*4.5);
            }
@@ -183,7 +185,7 @@ module screw_inlet(){
                 sphere(r=ball_rad+wall);
                 translate([screw_rad,-in*3-screw_offset+ball_rad+wall*2,wall*2]) sphere(r=ball_rad+wall);
                 //this added guy is an attempt to stop screw jams.
-                //translate([screw_rad,-in*3-screw_offset+ball_rad+wall*2,wall*2+ball_rad*2]) sphere(r=ball_rad+wall);
+                translate([screw_rad,-in*3-screw_offset+ball_rad+wall*2,wall*2+ball_rad*2]) sphere(r=ball_rad+wall);
                 translate([0,0,wall*2+ball_rad]) sphere(r=ball_rad+wall/2);
             }
         }
@@ -213,6 +215,67 @@ module screw_inlet(){
             *rotate([0,30,0]) translate([0,0,-peg_sep]) cylinder(r=screw_rad+1, h=100);
             *rotate([0,60,0]) translate([0,0,-peg_sep]) cylinder(r=screw_rad+1, h=100);
         }
+        
+        //rough in the screw
+        %translate([in*2,-in*1.5,0]) screw_segment_2(length=screw_length, starts=2, top=ROUND);
+        
+        //marbles in the chute
+        %translate([in*1.45, -in*1.5, in*1.75]) sphere(r=ball_rad);
+        
+        //testing: cut the whole thing in half
+        translate([0,-in*1.5-100,100]) cube([200,200,300], center=true);
+    }
+}
+
+//length is measured in revolutions!
+//this is a differenced version, all around the marble.
+module screw_segment_2(length = 4, starts = 2, top = PEG, inset = 7){  
+    pitch = screw_pitch;
+    true_pitch = screw_pitch*starts;
+    
+    screw_ball_rad = ball_rad+1;
+    echo("RAD");
+    echo(screw_ball_rad);
+    
+    screw_inner_rad = (7.5+wall)/2;
+    
+    //#cylinder(r=screw_rad, h=50);
+    
+    step = 30; //out of 360
+  
+    %translate([-screw_rad, 0, in*1.75]) sphere(r=ball_rad);
+    
+    difference(){
+        union(){        
+            //main tube
+            cylinder(r=screw_rad-.5, h=length*pitch);
+            
+            //handle the screw top
+            if(top == PEG){
+                //connect to the next screw along
+                translate([0,0,length*pitch-.1]) d_slot(shaft=7.5-slop*3, height=10-slop*2, dflat=.4+.4+slop, double_d=true);
+            }
+            
+            if(top == ROUND){
+                //this is just flat for now
+            }
+        }
+        
+        //cut paths into the side - trying to make it bind less
+        for(j=[1:starts]) rotate([0,0,j*(360/starts)]) translate([0,0,-pitch]) {
+            for(i=[0:step:360*length-step-1]) 
+                hull(){
+                    rotate([0,0,i]) translate([screw_rad+screw_ball_rad-inset, 0, i/360*true_pitch]) sphere(r=screw_ball_rad);
+                    rotate([0,0,i+step]) translate([screw_rad+screw_ball_rad-inset, 0, (i+step)/360*true_pitch]) sphere(r=screw_ball_rad);
+                    
+                }
+        }
+        
+        //d slot for the connection
+        translate([0,0,-.1]) d_slot(shaft=7.5, height=10, dflat=.4+.4, double_d=true);
+        
+        //flatten the base
+        translate([0,0,-50]) cube([50,50,100], center=true);
     }
 }
 

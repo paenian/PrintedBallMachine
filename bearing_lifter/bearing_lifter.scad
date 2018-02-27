@@ -13,7 +13,7 @@ hole_rad = 8;
 lift_rad = in*3;
 num_balls = 17;
 
-part = 2;
+part = 3;
 
 //laid out for printing
 if(part == 0)
@@ -119,6 +119,7 @@ module bearing_inlet(){
     
     motor_mount_height = 6.5;
     motor_mount_lift = motor_mount_height-1.1-wall;
+    gear_inset = in+5.5;
     
     translate([0,0,in])
     difference(){
@@ -126,12 +127,16 @@ module bearing_inlet(){
             translate([0,0,0]) inlet(height=1, length=1, width=3, hanger_height=4);
             
             //inlet ramp
-            translate([peg_sep,0,0]) track(rise=-.25*in, run=4*in, solid=1, end_angle=90, end_scale=[1.33,1,1]);
+            translate([peg_sep,0,0]) track(rise=-.25*in, run=4*in, solid=1, end_angle=90, end_scale=[1.25,1,1]);
+            intersection(){ //to cut off the front
+                translate([peg_sep*1.25+4*in,-in+.3,-.25*in]) rotate([0,0,-90]) scale([1,1.25,1]) track(rise=-.25*in, run=4*in, solid=1, end_angle=90, end_scale=[1.25,1,1]);
+                translate([0,-gear_inset+100,0]) cube([400,200,200], center=true);
+            }
             
             //bearing mount
             translate([in*4.5,0,in*3]) rotate([90,0,0]){
-                translate([0,-10,0]) scale([2.7,2,1]) cylinder(r1=10, r2=9.5, h = in+3, $fn=6);
-                translate([0,0,in-1]) cylinder(r1=hole_rad-slop*2, r2=hole_rad-slop*4, h = in*3/4-1, $fn=6);
+                translate([0,-10,0]) scale([2.7,2,1]) cylinder(r1=10, r2=9.5, h = gear_inset, $fn=6);
+                translate([0,0,in-1]) cylinder(r1=hole_rad-slop*2, r2=hole_rad-slop*4, h = in*3/4+4, $fn=6);
             }
             
             //motor mount
@@ -142,12 +147,12 @@ module bearing_inlet(){
               translate([0,0,motor_mount_lift]) hull() rotate([0,0,-90]) motorHoles(1, motor_bump = motor_mount_height, slot=slot, support=true);
            }
                   
-            hanger(solid=1, hole=[5,4], drop=in*3.2, rot=0);
+            scale([1,1.75,1]) hanger(solid=1, hole=[5,4], drop=in*3, rot=0);
             hanger(solid=1, hole=[4,4], drop=in*3.1, rot =0);
             hanger(solid=1, hole=[6,4], drop=in*3.75, rot = 37);
            
             //hanger(solid=1, hole=[0,4], drop=in*3.5, rot =-20);
-            hanger(solid=1, hole=[2,5], drop=in*3.9, rot = 0);
+            scale([1,1.75,1]) hanger(solid=1, hole=[2,5], drop=in*3.6, rot = 10);
             
         }
         
@@ -160,9 +165,9 @@ module bearing_inlet(){
               translate([0,0,motor_mount_lift]) rotate([0,0,-90]) motorHoles(0, motor_bump = motor_mount_height, slot=slot);
            }
         
-        hanger(solid=-1, hole=[5,4], drop=in*6.5);
-        hanger(solid=-1, hole=[4,4], drop=in*3.5, rot =-20);
-        hanger(solid=-1, hole=[6,4], drop=in*3.5, rot = 20);
+        hanger(solid=-1, hole=[5,4], drop=in*2);
+        hanger(solid=-1, hole=[4,4], drop=in*2, rot =-20);
+        hanger(solid=-1, hole=[6,4], drop=in*1, rot = 20);
            
         //hanger(solid=-1, hole=[1,2], drop=in*6.5);
            
@@ -180,6 +185,7 @@ module bearing_outlet(){
 	motor_rad = 33/2;
 	motor_mount_rad = 38/2;
 	m3_rad = 1.7;
+    gear_inset = in+5.5;
     
     motor_bump=3.5;
     
@@ -189,7 +195,12 @@ module bearing_outlet(){
     difference(){
         union(){
             //outlet ramp
-            translate([in*8,0,in*4.5]) mirror([i,0,0]) track(rise=.75*in-2, run=4*in, solid=1, end_angle=90, end_scale=[1.33,1,1]);
+            #translate([in*8.1,0,in*4.6]) mirror([i,0,0]) track(rise=.5*in, run=4.1*in, solid=1, end_angle=90, end_scale=[1.25,1,1]);
+            
+            intersection(){ //to cut off the front
+                translate([peg_sep*1.25+3.745*in,-in+.9,5.1*in]) rotate([0,0,-90]) scale([1,1.25,1]) track(rise=.125*in, run=4*in, solid=1, end_angle=90, end_scale=[1.25,1,1]);
+                translate([0,-gear_inset+100,0]) cube([400,200,400], center=true);
+            }
             
             //hangers
             hanger(solid=1, hole=[5,7], drop=in, rot=-20);
@@ -198,18 +209,28 @@ module bearing_outlet(){
             //this prevents the balls from rolling out prematurely
             translate([in*4.5,0,in*3]) {
                 for(i=[2:8]) hull() {
-                    rotate([0,35-i*support_step,0]) translate([lift_rad-in*3/16,0,0]) rotate([90,0,0]) cylinder(r1=1+(i)/4, r2=2+(i)/2, h=in);
-                    rotate([0,35-(i+1)*support_step,0]) translate([lift_rad-in*3/16,0,0]) rotate([90,0,0]) cylinder(r1=1+(i+1)/4, r2=2+(i+1)/2, h=in);
+                    rotate([0,37-i*support_step,0]) translate([lift_rad-in*3/16,0,0]) rotate([90,0,0]) cylinder(r1=1+(i)/4, r2=2+(i)/2, h=gear_inset);
+                    rotate([0,37-(i+1)*support_step,0]) translate([lift_rad-in*3/16,0,0]) rotate([90,0,0]) cylinder(r1=1+(i+1)/4, r2=2+(i+1)/2, h=gear_inset);
                 }
+                //first ramp up
                 hull(){
-                    rotate([0,35-2*support_step,0]) translate([lift_rad-in*3/16,0,0]) rotate([90,0,0]) cylinder(r1=1+(1)/4, r2=2+(1)/2, h=in);
-                    rotate([0,35-(1)*support_step,0]) translate([lift_rad-in*3/16,0,0]) rotate([90,0,0]) cylinder(r1=1+(0+1)/4, r2=2+(0+1)/2, h=in*.8);
+                    rotate([0,37-2*support_step,0]) translate([lift_rad-in*3/16,0,0]) rotate([90,0,0]) cylinder(r1=1+(1+1)/4, r2=2+(1+1)/2, h=gear_inset);
+                    rotate([0,37-(1)*support_step,0]) translate([lift_rad-in*3/16,0,0]) rotate([90,0,0]) cylinder(r1=1+(0+1)/4, r2=2+(0+1)/2, h=gear_inset*.8);
                 }
+                //last along the track
+                translate([0,-in+1,0]) for(i=[9:13]) hull() {
+                    rotate([0,37-i*support_step,0]) translate([lift_rad-in*3/16-i*2+18,0,0]) rotate([90,0,0]) cylinder(r1=1+(-i+17)/4, r2=8, h=gear_inset-in+1);
+                    rotate([0,37-(i+1)*support_step,0]) translate([lift_rad-in*3/16-i*2+16,0,0]) rotate([90,0,0]) cylinder(r1=1+(-i+16)/4, r2=8, h=gear_inset-in+1);
+                }
+                
             }
         }
         
         hanger(solid=-1, hole=[5,7], drop=in-1);
         hanger(solid=-1, hole=[8,7], drop=in*1.5);
+        
+        //cut off the next track
+        #translate([in*8+100-1,0,in*4.4]) cube([200,200,200], center=true);
     }
 }
 
@@ -288,8 +309,8 @@ module bearing(bearing=true, drive_gear=false){
                 //translate([0,0,-30]) d_slot(shaft=motor_shaft, height=60, dflat=motor_dflat);
                 
                 d_height = T;
-                round_inset = 12.5;
-                round_height = 20-4.75-round_inset;
+                round_inset = 10;
+                round_height = 20-5.5-round_inset;
                 round_rad = 3.25/2;
                 translate([0,0,-T/2-.2]) d_slot(shaft=7.1, height=d_height+round_height+round_inset, dflat=.625, double_d=true, round_inset=round_inset, round_height=round_height, round_rad=round_rad);
             }
