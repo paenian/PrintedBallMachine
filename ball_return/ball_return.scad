@@ -4,7 +4,7 @@ use <../pins.scad>
 use <../pushpeg.scad>
 use <../handle.scad>
 
-part = 7;
+part = 10;
 
 if(part == 0)
     rotate([0,90,0]) rear_ball_return_inlet();
@@ -37,7 +37,7 @@ if(part == 7)
 
 if(part == 10){
     basic_panel();
-    translate([in*12,in+peg_thick*2,0]) rotate([0,0,180]) basic_panel();
+    //translate([in*12,in+peg_thick*2,0]) rotate([0,0,180]) basic_panel();
 }
 
 module basic_panel(){
@@ -46,7 +46,7 @@ module basic_panel(){
 
         //ball return
         translate([in*12,0,in*5]) rear_ball_return_inlet_180();
-        //translate([0,0,in*4]) rear_ball_return_outlet();
+        translate([0,in*1.5+peg_thick+wall*1.5,in*5]) rotate([0,0,180]) rear_ball_return_inlet_180();
         
         //feet
         translate([peg_sep*10.5, 0, peg_sep*2.75]) push_peg_stand();
@@ -70,8 +70,8 @@ module straight_link(size = [4,2]){
         
         //peg knobs
         for(i=[1:size[0]]) for(j=[1:size[1]]) translate([peg_sep*i,peg_sep*j,0]) {
-            cylinder(r=peg_rad, h=wall+peg_thick-peg_rad/3);
-            translate([0,0,wall+peg_thick-peg_rad/3]) scale([1,1,2/3]) sphere(r=peg_rad);
+            cylinder(r=peg_rad-slop, h=wall+peg_thick-peg_rad/3);
+            translate([0,0,wall+peg_thick-peg_rad/3]) scale([1,1,2/3]) sphere(r=peg_rad-slop);
         }
     }
 }

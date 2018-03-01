@@ -4,7 +4,7 @@ use <../clank_drop/clank_drop.scad>;
 use <../screw_drop/bowl_drop.scad>;
 use <../ball_return/ball_return.scad>;
 
-part = 0;
+part = 10;
 
 screw_rad = ball_rad+wall*2;
 screw_pitch = ball_rad*2+wall*2;
@@ -44,22 +44,18 @@ module assembled(){
     basic_panel();
     
     //first lifter
-    translate([0,0,peg_sep*5]) screw_inlet();
-    translate([peg_sep*2,screw_offset,peg_sep*5]) rotate([0,angle,90]) translate([0,0,0]) screw_segment(length=screw_length, starts=1, top=ROUND);
+    translate([0,0,peg_sep*4]) screw_inlet();
+    //translate([peg_sep*2,screw_offset,peg_sep*4]) rotate([0,angle,90]) translate([0,0,0]) screw_segment(length=screw_length, starts=1, top=ROUND);
     
     //second lifter
-    translate([peg_sep*3,0,peg_sep*8]) screw_inlet();
-    translate([peg_sep*5,screw_offset,peg_sep*8]) rotate([0,angle,90]) translate([0,0,0]) screw_segment(length=screw_length, starts=2, top=ROUND);
+    //translate([peg_sep*9,0,peg_sep*3]) screw_inlet();
+    //translate([peg_sep*5,screw_offset,peg_sep*7]) rotate([0,angle,90]) translate([0,0,0]) screw_segment(length=screw_length, starts=2, top=ROUND);
     
     //bowl drop
-    translate([peg_sep*6,0,peg_sep*10]) bowl_drop(inlet_length=5, height = 2-.125, rad=2.5, height_scale=.55*in, lower=11.3);
+    //translate([peg_sep*6,0,peg_sep*9]) bowl_drop(inlet_length=5, height = 2-.125, rad=2.5, height_scale=.55*in, lower=11.3);
     
     //catch the ball out of the spinner
-    translate([peg_sep*8, 0, peg_sep*6]) offset_slope_module(size = [3,-.5]);
-    
-    //ball return
-    translate([in*12,0,in*7]) rear_ball_return_inlet();
-    translate([0,0,in*5.75]) rear_ball_return_outlet();
+    translate([peg_sep*8, 0, peg_sep*5]) offset_slope_module(size = [2,-.4]);
 }
 
 module screw_outlet(){
