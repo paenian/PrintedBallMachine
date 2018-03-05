@@ -17,8 +17,15 @@ The Printed Ball Machine is designed in [OpenSCAD](http://www.openscad.org/), th
 * USB Charger and Cables
   * The motors are nominally 6v, but run fine (a little slower) at 5v - so we cut up old or cheap USB cables to power them.
   * You can also buy USB splitters, to minimize the number of chargers needed - two motors per amp is safe, in practice 4 seems to work fine.
-  * M3x12mm flat-head screws - two to hold each motor on.
+  * M3x12mm flat-head screws - two to hold each motor on, no tapping :-)
+  * #3 by 3/8" flat wood screws - used to hold parts onto the motor, fits perfectly into its D-shaft, no tapping.
   * 12" x 3/8" wooden dowels - to make a single-module with ball recirculation.
 
 # Getting Started
 To get started, you need a pegboard, a motor or two, and a 3D printer. To make life easier, we've broken the parts into modules - 12"x12" units that can be linked together.  A module is not complete; it requires the addition of feet and a ball return option - either wooden dowels to recirculate around the back, straight peg clamps to attach it to another adjacent module, 180 degree ball returns to mate it to a second module behind it or 90 degree ball returns to turn it into a square.
+
+I think the best unit is actually two modules back-to-back - these can be recirculated simply, and joined by removing the recirculators and lining them up.  There are three ready modules:
+[Stair Lifter Module](stair_lifter_module/README.md)
+[Bearing Lifter Module](bearing_lifter_module/README.md)
+[Screw Lifter Module](screw_lifter_module/README.md)
+
