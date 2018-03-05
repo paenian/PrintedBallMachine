@@ -47,15 +47,21 @@ module assembled(){
     translate([0,0,peg_sep*4]) screw_inlet();
     //translate([peg_sep*2,screw_offset,peg_sep*4]) rotate([0,angle,90]) translate([0,0,0]) screw_segment(length=screw_length, starts=1, top=ROUND);
     
+    translate([peg_sep*3,0,peg_sep*6]) bowl_drop(inlet_length=3, height = 2-.125, rad=2.5, height_scale=.55*in, lower=11.3);
+    
+    translate([peg_sep*3,0,peg_sep*5]) inlet(length=3, width=3, outlet=CENTER);
+    
     //second lifter
-    //translate([peg_sep*9,0,peg_sep*3]) screw_inlet();
+    translate([peg_sep*6,0,peg_sep*4]) screw_inlet();
     //translate([peg_sep*5,screw_offset,peg_sep*7]) rotate([0,angle,90]) translate([0,0,0]) screw_segment(length=screw_length, starts=2, top=ROUND);
     
+    translate([peg_sep*9,0,peg_sep*7]) clank_drop(width=3, length=3, height = 2.0);
+    
     //bowl drop
-    //translate([peg_sep*6,0,peg_sep*9]) bowl_drop(inlet_length=5, height = 2-.125, rad=2.5, height_scale=.55*in, lower=11.3);
+    //translate([peg_sep*7,0,peg_sep*8]) bowl_drop(inlet_length=6, height = 2-.125, rad=2.5, height_scale=.55*in, lower=11.3);
     
     //catch the ball out of the spinner
-    translate([peg_sep*8, 0, peg_sep*5]) offset_slope_module(size = [2,-.4]);
+    //translate([peg_sep*9, 0, peg_sep*4]) offset_slope_module(size = [2,-.4]);
 }
 
 module screw_outlet(){
