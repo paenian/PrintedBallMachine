@@ -25,7 +25,11 @@ The Printed Ball Machine is designed in [OpenSCAD](http://www.openscad.org/), th
 To get started, you need a pegboard, a motor or two, and a 3D printer. To make life easier, we've broken the parts into modules - 12"x12" units that can be linked together.  A module is not complete; it requires the addition of feet and a ball return option - either wooden dowels to recirculate around the back, straight peg clamps to attach it to another adjacent module, 180 degree ball returns to mate it to a second module behind it or 90 degree ball returns to turn it into a square.
 
 I think the best unit is actually two modules back-to-back - these can be recirculated simply, and joined by removing the recirculators and lining them up.  There are three ready modules:
-[Stair Lifter Module](stair_lifter_module/README.md)
-[Bearing Lifter Module](bearing_lifter_module/README.md)
-[Screw Lifter Module](screw_lifter_module/README.md)
+
+[Stair Lifter Module](stair_lifter_module)
+
+[Bearing Lifter Module](bearing_lifter_module)
+
+[Screw Lifter Module](screw_lifter_module)
+
 
