@@ -7,7 +7,7 @@ The PBM is a marble machine that utilized pegboard for its vertical structure.  
 
 The Printed Ball Machine is designed in [OpenSCAD](http://www.openscad.org/), the programmer's solid modeler.
 
-# Common Parts
+# Common Parts (vitamins, in the RepRap lingo - stuff you'll need to buy)
 * Pegboard - 1" holes, 1/4" thick.  This is the 'heavy duty' pegboard, usually just brown hardboard.  Thinner stuff works, but not as well.  Generally sold in 2 foot by 4 foot sections - for modules, cut to 12" square.  Available at Home Depot/Lowes type stores - and they'll cut it if you ask nicely.
   * [home depot](https://www.homedepot.com/p/Triton-1-4-in-x-1-8-in-Heavy-Duty-Brown-Pegboard-Wall-Organizer-Set-of-4-TPB-4BR/205196091)
 * 5/8" Steel Ball Bearings - I get mine from McMaster Carr, but anything'll work.
@@ -32,4 +32,5 @@ I think the best unit is actually two modules back-to-back - these can be recirc
 
 [Screw Lifter Module](screw_lifter_module)
 
-
+# Common Parts for Printing: The Standard Module
+There are many standard parts in the 'parts' subfolder; in general modules will utilize many of these common components, i.e. feet, handles, pegs, ball returns, and simple sloped modules.  Then, each module will have a small number of largely unique parts, for its lifting and transporting mechanism.  A completed module will have a parts list divided into unique and standard, so it's easy to print and assemble it all :-)
