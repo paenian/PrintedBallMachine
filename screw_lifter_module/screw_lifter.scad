@@ -4,7 +4,7 @@ use <../clank_drop/clank_drop.scad>;
 use <../screw_drop/bowl_drop.scad>;
 use <../ball_return/ball_return.scad>;
 
-part = 10;
+part = 1;
 
 screw_rad = ball_rad+wall*2;
 screw_pitch = ball_rad*2+wall*2;
@@ -18,7 +18,7 @@ if(part == 0)
 if(part == 1)
     screw_segment_2(length=screw_length, starts=2, top=ROUND);
 if(part == 2)
-    screw_segment(length=screw_length, starts=1, top=ROUND);
+    screw_segment_2(length=screw_length, starts=1, top=ROUND);
 if(part == 3)
     rotate([-90,0,0]) bowl_drop(inlet_length=5, height = 2-.125, rad=2.5, height_scale=.55*in, lower=11.3);
 if(part == 4)
