@@ -686,8 +686,8 @@ module d_slot(shaft=6, height=10, tolerance = .2, dflat=.25, double_d=false, rou
 }
 
 module motorHoles(solid=1, motor_bump=4, support=false, slot=0, top_rad = 3.1){
-    %translate([0,37/2-12,-20.8/2]) cube([22.3,37,20.8], center=true);
-    %translate([0,37-12,-20.8/2]) rotate([-90,0,0]) cylinder(r=22/2, h=28);
+    //%translate([0,37/2-12,-20.8/2]) cube([22.3,37,20.8], center=true);
+    //%translate([0,37-12,-20.8/2]) rotate([-90,0,0]) cylinder(r=22/2, h=28);
     
     if(solid==1) translate([0,0,1]) {
         //mounting holes
@@ -709,7 +709,7 @@ module motorHoles(solid=1, motor_bump=4, support=false, slot=0, top_rad = 3.1){
     if(solid==0){
         translate([0,0,-1]){
             //center hole is overwritten by the sprocket hole, but it's good to have
-            //cylinder(r=5.2, h=30);
+            cylinder(r=5.2, h=30);
        
             //bump - straight up
             //translate([0,12,0]) cylinder(r=2.6, h=3.1);
@@ -722,9 +722,9 @@ module motorHoles(solid=1, motor_bump=4, support=false, slot=0, top_rad = 3.1){
             //mounting holes
             for(j=[0,1]) mirror([0,0,1]) translate([0,0,(20.8-2)*1]) for(i=[0,1]) mirror([i,0,0]) translate([17.5/2,20,0]) {
                 
-                hull() for(s=[-slot/2, slot/2]) translate([s,0,0]) cylinder(r=3.4/2, h=30);
-                translate([0,0,2.6]) hull() for(s=[-slot/2, slot/2]) translate([s,0,0]) cylinder(r1=3.4/2, r2=3.2, h=1.5);
-                translate([0,0,wall+1]) hull() for(s=[-slot/2, slot/2]) translate([s,0,0]) cylinder(r=3.2, h=20);
+                hull() for(s=[-slot/2, slot/2]) translate([s,0,-1]) cylinder(r=3.4/2, h=30);
+                translate([0,0,3]) hull() for(s=[-slot/2, slot/2]) translate([s,0,0]) cylinder(r1=3.4/2, r2=3.2, h=1.5);
+                translate([0,0,wall+1.5]) hull() for(s=[-slot/2, slot/2]) translate([s,0,0]) cylinder(r=3.2, h=20);
             }
        }
    }       

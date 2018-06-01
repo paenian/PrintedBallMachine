@@ -9,10 +9,12 @@ openscad -o parts/double_handle.stl -D part=4 handle.scad &
 
 #stand
 openscad -o parts/stand.stl -D part=0 pushpeg.scad &
+openscad -o parts/double_stand.stl -D part=20 pushpeg.scad &
 
 #pegs
 openscad -o parts/peg_tpu.stl -D part=1 pushpeg.scad &
 openscad -o parts/peg_tpu_handle.stl -D part=11 pushpeg.scad &
+openscad -o parts/peg_tpu_double_handle.stl -D part=121 pushpeg.scad &
 openscad -o parts/peg_petg.stl -D part=2 pushpeg.scad &
 openscad -o parts/peg_petg_handle.stl -D part=12 pushpeg.scad 
 

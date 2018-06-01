@@ -25,7 +25,7 @@ stab_rad=4; //radius of stabilizer triangle
 face = in-shaft*2-1;
 
 //render everything
-part=3;
+part=2;
 
 //parts for laser cutting
 if(part == 0)
@@ -46,38 +46,45 @@ if(part == 6){
     translate([length,0,0]) translate([length,0,0]) rotate([0,angle,0]) link(ball_grabber=false);
 }
 
-clearance_rad = 55;
+if(part == 11){
+    link_loop();
+}
+
+clearance_rad = 53;
 angle = 60;
 if(part==10){
-    link_loop();
+    
     
     //todo: place these correctly
     cl_inlet();
     
     //drive gear
-    translate([length/2,0,-in*3-thickness-.5]) rotate([90,0,0]) drive_gear();
+    translate([in*2.5,in*1.5,in*1.5]) rotate([90,0,0]) {
+        translate([length/2,0,-in*3-thickness-.5]) rotate([90,0,0]) drive_gear();
+        rotate([0,0,0]) link_loop();
+    }
     
     cl_outlet();
 }
 
 module link_loop(){
     //do a full loop of links
-    link(ball_grabber=true);
-    translate([length,0,0]) rotate([0,angle,0]) link(ball_grabber=false);
-    translate([length,0,0]) rotate([0,angle,0]) translate([length,0,0]) rotate([0,angle,0]) link(ball_grabber=true);
-    translate([length,0,0]) rotate([0,angle,0]) translate([length,0,0]) rotate([0,angle,0]) translate([length,0,0]) rotate([0,angle,0]) link(ball_grabber=false);
-    translate([length,0,0]) rotate([0,angle,0]) translate([length,0,0]) rotate([0,angle,0]) translate([length,0,0]) rotate([0,angle,0]) translate([length,0,0]) rotate([0,angle,0]) link(ball_grabber=true);
-    translate([length,0,0]) rotate([0,angle,0]) translate([length,0,0]) rotate([0,angle,0]) translate([length,0,0]) rotate([0,angle,0]) translate([length,0,0]) rotate([0,angle,0]) translate([length,0,0]) rotate([0,angle,0]) link(ball_grabber=false);
+    link(ball_grabber=false);
+    translate([length,0,0]) rotate([0,angle,0]) link(ball_grabber=true);
+    translate([length,0,0]) rotate([0,angle,0]) translate([length,0,0]) rotate([0,angle,0]) link(ball_grabber=false);
+    translate([length,0,0]) rotate([0,angle,0]) translate([length,0,0]) rotate([0,angle,0]) translate([length,0,0]) rotate([0,angle,0]) link(ball_grabber=true);
+    translate([length,0,0]) rotate([0,angle,0]) translate([length,0,0]) rotate([0,angle,0]) translate([length,0,0]) rotate([0,angle,0]) translate([length,0,0]) rotate([0,angle,0]) link(ball_grabber=false);
+    translate([length,0,0]) rotate([0,angle,0]) translate([length,0,0]) rotate([0,angle,0]) translate([length,0,0]) rotate([0,angle,0]) translate([length,0,0]) rotate([0,angle,0]) translate([length,0,0]) rotate([0,angle,0]) link(ball_grabber=true);
 }
 
-module drive_gear(){
+module drive_gear(facets = 6){
     translate([0,clearance_rad+wall,0]) difference(){
         union(){
-            cylinder(r=face, h=in, center=true, $fn=6);
+            cylinder(r=face, h=in, center=true, $fn=facets);
             
             //alignment groove
             hull() for(i=[0:60:359]) rotate([0,0,i]) {
-                translate([0,face*cos(180/6),0]) rotate([0,90,0]) cylinder(r=groove_rad-slop/2, h=face-thickness, center=true, $fn=6);
+                translate([0,face*cos(180/facets),0]) rotate([0,90,0]) cylinder(r=groove_rad-slop/2, h=face-thickness, center=true, $fn=6);
             }
         
             //clearance for the balls
@@ -93,7 +100,7 @@ module drive_gear(){
         }
         
         //d shaft
-        translate([0,0,-30]) d_slot(shaft=motor_shaft, height=60, dflat=motor_dflat);
+        translate([0,0,-in/2-.1]) d_slot(shaft=motor_shaft, height=60, dflat=motor_dflat, double_d=true, round_inset = in-6, round_height = 4);
     }
 }
 
@@ -101,8 +108,8 @@ module idler_gear2(){
     bearing();
 }
 
-module idler_gear(){
-    outer_rad = face*cos(180/6)-1.25;
+module idler_gear(facets=6){
+    outer_rad = face*cos(180/facets)-1.25;
     inner_rad = idler_shaft-1;
     height = in/2;
     num_rollers = 8;
@@ -110,12 +117,12 @@ module idler_gear(){
         union(){
             difference(){
                 union(){
-                    cylinder(r=face, h=height, center=true, $fn=6);
+                    cylinder(r=face, h=height, center=true, $fn=facets);
                     case(width=height,out_rad1=outer_rad,out_rad2=outer_rad,in_rad=inner_rad);
                     
                     //alignment groove
                     hull() for(i=[0:60:359]) rotate([0,0,i]) {
-                        translate([0,face*cos(180/6),0]) rotate([0,90,0]) cylinder(r=groove_rad-slop/2, h=face-thickness, center=true, $fn=6);
+                        translate([0,face*cos(180/facets),0]) rotate([0,90,0]) cylinder(r=groove_rad-slop/2, h=face-thickness, center=true, $fn=6);
                         }
                 }
                 
@@ -145,7 +152,7 @@ module idler_gear(){
 module guide_moon(){
     hull(){
         translate([inlet_width/2*in, wall*2.5, in*1.5]) cylinder(r=clearance_rad, h=in, center=true);
-        translate([inlet_width/2*in, wall*2.5, in*1.5]) cylinder(r=clearance_rad+wall*2, h=.1, center=true);
+        translate([inlet_width/2*in, wall*2.5, in*1.5]) cylinder(r=clearance_rad+wall*4, h=.1, center=true);
     }
 }
 
@@ -158,16 +165,10 @@ module cl_inlet(){
     difference(){
         union(){
             //tray
-            intersection(){
-                rotate([-90,0,0]) inlet(length=inlet_width, outlet=NONE, hanger_height=0, hanger_vert=true);
-                rotate([-90,0,0]) translate([inlet_width*in,0,0]) mirror([1,0,0]) inlet(length=inlet_width, outlet=NONE, hanger_height=0);
+            render() intersection(){
+                rotate([-90,0,0]) inlet(length=inlet_width, outlet=NONE, hanger_height=1, hanger_vert=true);
+                rotate([-90,0,0]) translate([inlet_width*in,0,0]) mirror([1,0,0]) inlet(length=inlet_width, outlet=NONE, hanger_height=1);
             }
-            
-            //hangers
-                #translate([in,hanger_h,-in+inlet_z]) rotate([-90,0,0]) difference(){
-                    hanger(solid=1, hole=[1,1+hanger_h], drop =hanger_h);
-                    hanger(solid=-1, hole=[1,1+hanger_h], drop =hanger_h);
-                }
             
             //flat floor - will cut into it later, to slope the marbles in.
             cube([inlet_width*in,wall*4,in*3]);
@@ -181,18 +182,23 @@ module cl_inlet(){
             //motor mount
             translate([inlet_width/2*in,clearance_rad+wall,in]) hull(){
                 motorHoles(1, support=true);
-                translate([0,-clearance_rad+wall,-in]) cylinder(r=wall, h=wall*2);
+                for(i=[0,1]) mirror([i,0,0]) translate([inlet_width/2*in*.75,-clearance_rad+wall,-in]) cylinder(r=wall, h=wall*2);
             }
         }
         
-        //bed hollow
+        //hangers
+        for(i=[1:inlet_width]){
+            rotate([-90,0,0]) hanger(solid = -1, hole=[i,2]);
+        }
+        
+        //guide hollow
         translate([inlet_width/2*in, clearance_rad+wall, in*1.5]) hull(){
             cylinder(r=clearance_rad, h=in+.1, center=true);
-            cylinder(r=clearance_rad+wall/2, h=.1, center=true);
+            cylinder(r=clearance_rad+wall, h=.1, center=true);
         }
         
         //motor mount
-        translate([inlet_width/2*in,clearance_rad+wall,in]) motorHoles(0);
+        translate([inlet_width/2*in,clearance_rad+wall,in]) motorHoles(0, motor_bump = 10);
         
         //bed slope
         difference(){
@@ -201,7 +207,7 @@ module cl_inlet(){
                 translate([wall,wall*4,wall]) cube([inlet_width*in-wall*2,.1,in*3-wall*2]);
             }
             //guide moon, and blocker
-            guide_moon(inlet_width=inlet_width);
+            render() guide_moon(inlet_width=inlet_width);
         }
     }
 }
@@ -388,6 +394,3 @@ module bearing(bearing=true, drive_gear=false){
             }
         }
 }
-
-//next section
-%translate([in*5,0,in]) inlet(height=2);
