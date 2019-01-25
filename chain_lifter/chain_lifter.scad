@@ -77,10 +77,10 @@ module link_loop(){
     translate([length,0,0]) rotate([0,angle,0]) translate([length,0,0]) rotate([0,angle,0]) translate([length,0,0]) rotate([0,angle,0]) translate([length,0,0]) rotate([0,angle,0]) translate([length,0,0]) rotate([0,angle,0]) link(ball_grabber=true);
 }
 
-module drive_gear(facets = 6){
+module drive_gear(facets = 6, thick=in-4.5){
     translate([0,clearance_rad+wall,0]) difference(){
         union(){
-            cylinder(r=face, h=in, center=true, $fn=facets);
+            cylinder(r=face, h=thick, center=true, $fn=facets);
             
             //alignment groove
             hull() for(i=[0:60:359]) rotate([0,0,i]) {
@@ -94,13 +94,13 @@ module drive_gear(facets = 6){
             %cylinder(r=clearance_rad, h=1, center=true);
             
             //extra bump for the motor
-            translate([0,0,motor_bump/2]) cylinder(r=motor_shaft, h=in+motor_bump, center=true);
+            translate([0,0,motor_bump/2]) cylinder(r=motor_shaft, h=thick+motor_bump, center=true);
             
             
         }
         
         //d shaft
-        translate([0,0,-in/2-.1]) d_slot(shaft=motor_shaft, height=60, dflat=motor_dflat, double_d=true, round_inset = in-6, round_height = 4);
+        translate([0,0,-in/2-.1]) d_slot(shaft=motor_shaft, height=60, dflat=motor_dflat, double_d=true, round_inset = in-10, round_height = 4.25);
     }
 }
 

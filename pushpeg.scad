@@ -265,11 +265,8 @@ module beefy_push_peg_stand(peg_units = 2, thick = in*1.875, height=4, front_dro
                     }
                 }
                 
-                hull(){
-                    translate([0,-base_length/2-wall,brace_height+thick/2-i*thick/2]) scale([1,(base_length-wall*2)/in,(2*brace_height+thick)/in-i/2]) rotate([0,90,0]) cylinder(r=in/2, h=60, center=true, $fn=60);
-                    translate([0,-base_length/2-wall,brace_height+thick/2]) scale([1,(base_length-wall*2)/in,(2*brace_height+thick)/in]) rotate([0,90,0]) cylinder(r=in/2, h=20, center=true, $fn=60);
-                    
-                }
+                //round out the legs
+                translate([0,-base_length/2-wall,brace_height+thick/2]) scale([1,(base_length-wall*2)/in-.125,(2*brace_height+thick)/in]) rotate([0,90,0]) cylinder(r=in/2, h=60, center=true, $fn=60);
             }
         }
         
@@ -294,7 +291,7 @@ module beefy_push_peg_stand(peg_units = 2, thick = in*1.875, height=4, front_dro
         translate([0,0,-100-peg_sep*height-in/2+.1]) cube([200,200,200], center=true);
         
         //cut off the back cuz we don't really need it
-        translate([0,100+peg_thick+rear_gap+wall,0]) cube([300,200,300], center=true);
+        //translate([0,100+peg_thick+rear_gap+wall,0]) cube([300,200,300], center=true);
         
         %translate([0,in/4,-in*4]) cube([in,in,in]);
     }
