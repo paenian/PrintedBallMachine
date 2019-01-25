@@ -4,7 +4,7 @@ use <../clank_drop/clank_drop.scad>;
 use <../screw_drop/bowl_drop.scad>;
 use <../ball_return/ball_return.scad>;
 
-part = 1;
+part = 8;
 
 screw_rad = ball_rad+wall*2;
 screw_pitch = ball_rad*2+wall*2;
@@ -27,6 +27,9 @@ if(part == 5)
     rotate([0,90,0]) rear_ball_return_inlet();
 if(part == 6)
     rotate([0,-90,0]) rear_ball_return_outlet();
+
+if(part == 8)
+    screw_segment_inset(length=screw_length, starts=2, top=PEG);
 
 if(part==10){
     assembled();
@@ -226,6 +229,65 @@ module screw_inlet(){
         
         //testing: cut the whole thing in half
         //translate([0,-in*1.5-100,100]) cube([200,200,300], center=true);
+    }
+}
+
+//length is measured in revolutions!
+//this is a differenced version, all around the marble.
+module screw_segment_inset(length = 4, starts = 2, top = PEG){
+    screw_rad = 27;
+    pitch = screw_pitch+7;
+    true_pitch = pitch*starts;
+    
+    screw_ball_rad = ball_rad+1;
+    inset = screw_ball_rad*2;
+    echo("RAD");
+    echo(screw_ball_rad);
+    
+    screw_inner_rad = (7.5+wall)/2;
+    
+    //#cylinder(r=screw_rad, h=50);
+    
+    step = 30; //out of 360
+  
+    %translate([-screw_rad, 0, in*1.75]) sphere(r=ball_rad);
+    %translate([-screw_rad-ball_rad*2, 0, in*1.75]) sphere(r=ball_rad);
+    
+    difference(){
+        union(){        
+            //main tube
+            cylinder(r=screw_rad-.5, h=length*pitch);
+            
+            //handle the screw top
+            if(top == PEG){
+                //connect to the next screw along
+                translate([0,0,length*pitch-.1]) d_slot(shaft=11-slop*3, height=10-slop*2, dflat=.4+.4+slop, double_d=true);
+            }
+            
+            if(top == ROUND){
+                //this is just flat for now
+            }
+        }
+        
+        //cut paths into the side - trying to make it bind less
+        for(j=[1:starts]) rotate([0,0,j*(360/starts)]) translate([0,0,-pitch]) {
+            for(i=[0:step:360*length-step-1]) {
+                hull(){
+                    rotate([0,0,i]) translate([screw_rad+screw_ball_rad-inset, 0, i/360*true_pitch]) sphere(r=screw_ball_rad);
+                    rotate([0,0,i+step]) translate([screw_rad+screw_ball_rad-inset, 0, (i+step)/360*true_pitch]) sphere(r=screw_ball_rad);
+                //}
+                //hull(){
+                    rotate([0,0,i]) translate([screw_rad+screw_ball_rad*2-inset, 0, screw_ball_rad+i/360*true_pitch]) sphere(r=screw_ball_rad);
+                    rotate([0,0,i+step]) translate([screw_rad+screw_ball_rad*2-inset, 0, screw_ball_rad+(i+step)/360*true_pitch]) sphere(r=screw_ball_rad);
+                }
+            }
+        }
+        
+        //d slot for the connection
+        translate([0,0,-.1]) rotate([0,0,90]) d_slot(shaft=11, height=10, dflat=.4+.4, double_d=true);
+        
+        //flatten the base
+        translate([0,0,-50]) cube([50,50,100], center=true);
     }
 }
 
