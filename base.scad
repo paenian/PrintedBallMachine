@@ -668,7 +668,8 @@ module d_slot(shaft=6, height=10, tolerance = .2, dflat=.25, double_d=false, rou
        difference(){ 
            cylinder(r=shaft/2+tolerance, h=height+.01);
            translate([-shaft/2,shaft/2-dflat,0]) cube([shaft, shaft, height+.01]);
-           if(double_d==true){
+           echo(double_d);
+           if(double_d == true){
                mirror([0,1,0]) translate([-shaft/2,shaft/2-dflat,0]) cube([shaft, shaft, height+.01]);
            }
            

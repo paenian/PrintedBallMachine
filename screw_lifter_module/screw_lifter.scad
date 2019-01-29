@@ -4,7 +4,7 @@ use <../clank_drop/clank_drop.scad>;
 use <../screw_drop/bowl_drop.scad>;
 use <../ball_return/ball_return.scad>;
 
-part = 8;
+part = 7;
 
 screw_rad = ball_rad+wall*2;
 screw_pitch = ball_rad*2+wall*2;
@@ -28,8 +28,12 @@ if(part == 5)
 if(part == 6)
     rotate([0,-90,0]) rear_ball_return_outlet();
 
+if(part == 7)
+    screw_inlet_2(height = screw_length, width = in*5.4, screw_rad = 19);
 if(part == 8)
-    screw_segment_inset(length=screw_length, starts=2, top=PEG);
+    screw_segment_inset(length=screw_length, starts=2, top=PEG, bot=PEG, screw_rad = 19);
+if(part == 9)
+    screw_segment_inset(length=screw_length, starts=2, top=PEG, bot=MOTOR, screw_rad = 19);
 
 if(part==10){
     assembled();
@@ -41,6 +45,7 @@ angle = 0;
 ROUND = 2;
 NONE = 0;
 PEG = 1;
+MOTOR = 3;
 
 module assembled(){
     //draw in the pegboard & rear ball return
@@ -65,21 +70,6 @@ module assembled(){
     
     //catch the ball out of the spinner
     //translate([peg_sep*9, 0, peg_sep*4]) offset_slope_module(size = [2,-.4]);
-}
-
-module screw_outlet(){
-    difference(){
-        union(){
-            inlet(length=3, inset=0);
-        }
-        
-        //angled hole for the screw
-        translate([0,screw_offset, 0]) hull() {
-            translate([0,0,-peg_sep/2]) cylinder(r=screw_rad+1, h=100);
-            rotate([0,30,0]) translate([0,0,-peg_sep]) cylinder(r=screw_rad+1, h=100);
-            rotate([0,60,0]) translate([0,0,-peg_sep]) cylinder(r=screw_rad+1, h=100);
-        }
-    }
 }
 
 module slide_motor_mount(angle_inset = 20, max_angle = 75, motor_width = 20){
@@ -232,15 +222,115 @@ module screw_inlet(){
     }
 }
 
+//this is the lift module :-)
+module screw_inlet_2(height = screw_length, length = in*4, width = in*5.4){
+    motor_width = 20;
+    open_angle=0;
+    
+    pitch = screw_pitch+5;
+    height = screw_length*pitch;
+    
+    drop = .25*in/2;
+    back_drop = .25*in/4;
+    
+    motor_dimple_h = 6;
+    motor_dimple_r = 6.5;
+    motor_shaft_offset = 7;
+    
+    num_guides = 4;
+    guide_rad = 6;
+    
+    difference(){
+        union(){
+            //box
+            difference(){
+                translate([0,0,in/2]) cube([length, width, in], center=true);
+                
+                //slope in towards the screw
+                intersection(){
+                    hull(){
+                        translate([0,0,motor_dimple_h+wall+in/4]) cylinder(r=in*3.333, h=in*2);
+                        translate([0,0,motor_dimple_h+wall]) cylinder(r=screw_rad, h=height+10); //this lets the marbles into the screw, too
+                    }
+                    translate([0,0,in]) cube([length-wall*2, width-wall*2, in*2], center=true);
+                }
+            }
+            
+            //screw guides
+            for(i=[45:360/num_guides:359]) rotate([0,0,i]) {
+                translate([screw_rad+guide_rad*1.5,0,0]) scale([2,.75,1]) cylinder(r=guide_rad, h=height, $fn=4);
+            }
+            
+            //guide supports
+            for(i=[in*1.5:in*1.5:height-in/2]) translate([0,0,i]) {
+                rotate([0,0,45]) difference(){
+                    cylinder(r=(screw_rad+guide_rad*1.54)/cos(180/4), h=guide_rad, $fn=4);
+                    translate([0,0,-.5]) cylinder(r=(screw_rad+guide_rad*1.54)/cos(180/4)-guide_rad, h=guide_rad+1, $fn=4);
+                }
+            }
+            
+            //todo: attach to board support
+        }
+        
+        //motor mount
+        gear_motor();
+        
+        //screw inset
+        translate([0,0,motor_dimple_h-.1]) cylinder(r=screw_rad+.75, h=height+10, $fn=72);
+        
+        //rough in the screw
+        %rotate([0,0,40]) render() translate([0,0,motor_dimple_h]) screw_segment_inset(length=screw_length, starts=2, top=PEG, bot=PEG, screw_rad = screw_rad, step = 36);
+    }
+}
+
+module gear_motor(screws = true){
+    motor_dimple_h = 6;
+    motor_dimple_r = 6.5;
+    
+    motor_shaft_r = 3.5;
+    motor_shaft_h = 20;
+    
+    motor_shaft_offset = 7;
+    
+    gear_r = 37/2;
+    gear_h = 22;
+    motor_r = 35/2;
+    motor_h = 31;
+    
+    num_screws = 6;
+    screw_ring_r = 31/2;
+    screw_r = 1.875;
+    screw_h = 2.9;
+    screw_cap_r = 3.25;
+    screw_cap_h = 12;
+    
+    
+    translate([-motor_shaft_offset,0,0]) 
+    union(){
+        translate([0,0,-gear_h]) cylinder(r=gear_r, h=gear_h);
+        translate([0,0,-gear_h-motor_h]) cylinder(r=motor_r, h=motor_h+.1);
+        translate([motor_shaft_offset,0,-.1]) {
+            cylinder(r=motor_dimple_r, h=motor_dimple_h+.1);
+            cylinder(r=motor_shaft_r, h=motor_shaft_h+.1);
+        }
+        
+        if(screws == true){
+            for(i=[0:360/num_screws:359]) rotate([0,0,i]){
+                translate([0,screw_ring_r,-.1]) cylinder(r=screw_r, h=screw_h+screw_cap_h);
+                translate([0,screw_ring_r,screw_h-.1]) cylinder(r=screw_cap_r, h=screw_h+screw_cap_h);
+            }
+        }
+    }
+}
+
 //length is measured in revolutions!
 //this is a differenced version, all around the marble.
-module screw_segment_inset(length = 4, starts = 2, top = PEG){
-    screw_rad = 27;
-    pitch = screw_pitch+7;
+module screw_segment_inset(length = 4, starts = 2, top = PEG, bot = PEG, screw_rad = 19, step = 18){
+    pitch = screw_pitch+5;
     true_pitch = pitch*starts;
     
     screw_ball_rad = ball_rad+1;
-    inset = screw_ball_rad*2;
+    inset = ball_rad*1.6;
     echo("RAD");
     echo(screw_ball_rad);
     
@@ -248,20 +338,20 @@ module screw_segment_inset(length = 4, starts = 2, top = PEG){
     
     //#cylinder(r=screw_rad, h=50);
     
-    step = 30; //out of 360
+    
   
-    %translate([-screw_rad, 0, in*1.75]) sphere(r=ball_rad);
-    %translate([-screw_rad-ball_rad*2, 0, in*1.75]) sphere(r=ball_rad);
+    %rotate([0,0,step*7]) translate([screw_rad+screw_ball_rad-inset, 0, step*7/360*true_pitch-(screw_ball_rad-ball_rad)]) sphere(r=ball_rad);
+    %translate([0,screw_rad+ball_rad*3-inset,  in*1.75-2.5]) sphere(r=ball_rad);
     
     difference(){
         union(){        
             //main tube
-            cylinder(r=screw_rad-.5, h=length*pitch);
+            cylinder(r=screw_rad-.5, h=length*pitch, $fn=720/step);
             
             //handle the screw top
             if(top == PEG){
                 //connect to the next screw along
-                translate([0,0,length*pitch-.1]) d_slot(shaft=11-slop*3, height=10-slop*2, dflat=.4+.4+slop, double_d=true);
+                translate([0,0,length*pitch-.1]) d_slot(shaft=9-slop*3, height=10-slop*2, dflat=.4+.4+slop*2, round_inset = 0, round_height = 0, double_d=true);
             }
             
             if(top == ROUND){
@@ -275,16 +365,23 @@ module screw_segment_inset(length = 4, starts = 2, top = PEG){
                 hull(){
                     rotate([0,0,i]) translate([screw_rad+screw_ball_rad-inset, 0, i/360*true_pitch]) sphere(r=screw_ball_rad);
                     rotate([0,0,i+step]) translate([screw_rad+screw_ball_rad-inset, 0, (i+step)/360*true_pitch]) sphere(r=screw_ball_rad);
-                //}
-                //hull(){
-                    rotate([0,0,i]) translate([screw_rad+screw_ball_rad*2-inset, 0, screw_ball_rad+i/360*true_pitch]) sphere(r=screw_ball_rad);
-                    rotate([0,0,i+step]) translate([screw_rad+screw_ball_rad*2-inset, 0, screw_ball_rad+(i+step)/360*true_pitch]) sphere(r=screw_ball_rad);
+                    
+                    //expansion up and out
+                    rotate([0,0,i]) translate([screw_rad+screw_ball_rad*4-inset, 0, screw_ball_rad*2+i/360*true_pitch]) sphere(r=screw_ball_rad);
+                    rotate([0,0,i+step]) translate([screw_rad+screw_ball_rad*4-inset, 0, screw_ball_rad*2+(i+step)/360*true_pitch]) sphere(r=screw_ball_rad);
                 }
             }
         }
         
         //d slot for the connection
-        translate([0,0,-.1]) rotate([0,0,90]) d_slot(shaft=11, height=10, dflat=.4+.4, double_d=true);
+        if(bot == MOTOR) {
+            translate([0,0,-.1]) rotate([0,0,90]) d_slot(shaft=6.33, height=15, dflat=.4+.3, round_inset = 0, round_height = 0, double_d=false);
+            translate([0,0,-.1]) rotate([0,0,90]) cylinder(r1=6.9/2, r2=6.7/2, h=3.5);
+        }
+        
+        if(bot == PEG) {
+            translate([0,0,-.1]) d_slot(shaft=9, height=10, dflat=.4+.4, round_inset = 0, round_height = 0, double_d=true);
+        }
         
         //flatten the base
         translate([0,0,-50]) cube([50,50,100], center=true);
