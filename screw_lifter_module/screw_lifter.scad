@@ -29,11 +29,19 @@ if(part == 6)
     rotate([0,-90,0]) rear_ball_return_outlet();
 
 if(part == 7)
-    screw_inlet_2(height = screw_length, width = in*5.4, screw_rad = 19);
+    screw_inlet_2(height = screw_length, width = in*5.45, screw_rad = 19, num_guides = 4);
 if(part == 8)
     screw_segment_inset(length=screw_length, starts=2, top=PEG, bot=PEG, screw_rad = 19);
 if(part == 9)
     screw_segment_inset(length=screw_length, starts=2, top=PEG, bot=MOTOR, screw_rad = 19);
+if(part == 77)
+    screw_inlet_2(height = screw_length, width = in*7.5, screw_rad = 19, legs=true);
+
+if(part == 777)
+    fountain_leg(height = 70, width = in*7);
+
+if(part == 7777)
+    fountain_guide_extension(height = 70, width = in*7);
 
 if(part==10){
     assembled();
@@ -223,7 +231,7 @@ module screw_inlet(){
 }
 
 //this is the lift module :-)
-module screw_inlet_2(height = screw_length, length = in*4, width = in*5.4){
+module screw_inlet_2(height = screw_length, length = in*5, width = in*5.4, legs=false, num_guides = 3){
     motor_width = 20;
     open_angle=0;
     
@@ -237,49 +245,116 @@ module screw_inlet_2(height = screw_length, length = in*4, width = in*5.4){
     motor_dimple_r = 6.5;
     motor_shaft_offset = 7;
     
-    num_guides = 4;
-    guide_rad = 6;
+    
+    guide_rad = 8;
+    
+    screw_offset = length/2-screw_rad-wall;
     
     difference(){
         union(){
-            //box
-            difference(){
-                translate([0,0,in/2]) cube([length, width, in], center=true);
-                
-                //slope in towards the screw
-                intersection(){
-                    hull(){
-                        translate([0,0,motor_dimple_h+wall+in/4]) cylinder(r=in*3.333, h=in*2);
-                        translate([0,0,motor_dimple_h+wall]) cylinder(r=screw_rad, h=height+10); //this lets the marbles into the screw, too
+            if(legs == false){
+                translate([screw_offset,0,0]) difference(){  //box
+                    intersection(){
+                        translate([0,0,in/2]) cube([length, width, in], center=true);
+                        translate([0,0,motor_dimple_h+wall+in/4]) cylinder(r=in*3.333+wall, h=in*4, center=true, $fn=90);
                     }
-                    translate([0,0,in]) cube([length-wall*2, width-wall*2, in*2], center=true);
+                
+                    //slope in towards the screw
+                    intersection(){
+                        hull(){
+                            translate([0,0,motor_dimple_h+wall+in/4]) cylinder(r=in*3.333, h=in*2, $fn=90);
+                            translate([-screw_offset,0,0]) translate([0,0,motor_dimple_h+wall]) cylinder(r=screw_rad, h=height+10); //this lets the marbles into the screw, too
+                        }
+                        translate([0,0,in]) cube([length-wall*2, width-wall*2, in*2], center=true);
+                    }
+                }
+            }else{
+                difference(){  //circle
+                    union(){
+                        cylinder(r1=width/2-in, r2=width/2, h=in*1.5, $fn=90);
+                        rotate_extrude($fn=90){
+                            translate([width/2-wall/2,in*1.5]) circle(r=wall/2);
+                        }
+                    }
+                
+                    //slope in towards the screw
+                    intersection(){
+                        scale([1,1,height/width+.1]) translate([0,0,width+motor_dimple_h+3]) sphere(r=width, $fn=180);
+                        
+                        translate([0,0,.1]) cylinder(r1=width/2-in-wall, r2=width/2-wall, h=in*1.5, $fn=90);
+                    }
                 }
             }
             
             //screw guides
-            for(i=[45:360/num_guides:359]) rotate([0,0,i]) {
-                translate([screw_rad+guide_rad*1.5,0,0]) scale([2,.75,1]) cylinder(r=guide_rad, h=height, $fn=4);
-            }
-            
-            //guide supports
-            for(i=[in*1.5:in*1.5:height-in/2]) translate([0,0,i]) {
-                rotate([0,0,45]) difference(){
-                    cylinder(r=(screw_rad+guide_rad*1.54)/cos(180/4), h=guide_rad, $fn=4);
-                    translate([0,0,-.5]) cylinder(r=(screw_rad+guide_rad*1.54)/cos(180/4)-guide_rad, h=guide_rad+1, $fn=4);
+            if(legs == true){
+                for(i=[0:360/num_guides:359]) rotate([0,0,i]) {
+                    hull(){
+                        translate([screw_rad+guide_rad*1.5,0,0]) scale([2,.75,1]) cylinder(r=guide_rad, h=height-in/2, $fn=4);
+                        translate([screw_rad+guide_rad*1,0,height-guide_rad/2]) scale([2,.75,1]) sphere(r=guide_rad/2);
+                    }
                 }
+            }else{
+                for(i=[0,1]) mirror([0,i,0]) rotate([0,0,45]) translate([screw_rad+guide_rad*1.5,0,0]) scale([2,.75,1]) cylinder(r=guide_rad, h=height, $fn=4);
+                
+                hull() for(i=[0,1]) mirror([0,i,0]) rotate([0,0,135]) translate([screw_rad+guide_rad*1.5,0,0]) scale([2,.75,1]) cylinder(r=guide_rad, h=height, $fn=4);
+            }
+        }
+        
+        //attach bottom to the pegboard
+        if(legs == false){
+            //side holes for the pegboard
+            for(j=[-peg_sep,0,peg_sep]) for(i=[0,1]) mirror([0,i,0]) translate([screw_offset-length/2+peg_sep/2+j,width/2,peg_sep/2]) {
+                rotate([90,0,0]) cylinder(r=m5_rad, h=in, center=true);
+                translate([0,-wall,0]) rotate([90,0,0]) rotate([0,0,45]) cylinder(r=m5_sq_nut_rad, h=m5_nut_height, $fn=4);
             }
             
-            //todo: attach to board support
+            //this is the actual board
+            translate([screw_offset-length/2-peg_sep/2,0,0]) cube([in*3/4, width+.1, in*50], center=true);
+            
+            //bolt the screw guides to the board
+            translate([screw_offset-length/2-peg_sep/2,0,0])
+            for(i=[1:1:height/(in*1.333)]) mirror([0,i%2,0]) translate([0,screw_rad/2,i*in*1.333]) {
+                rotate([0,90,0]) rotate([0,0,-90]) cap_cylinder(r=3, h=in/2);
+                translate([in/2-.1,0,0]) rotate([0,90,0]) cylinder(r1=3, r2=6, h=3.05);
+                translate([in/2+3-.1,0,0]) rotate([0,90,0]) rotate([0,0,-90]) cap_cylinder(r=6, h=10);
+            }
         }
         
         //motor mount
-        gear_motor();
+        rotate([0,0,180]) gear_motor();
         
         //screw inset
-        translate([0,0,motor_dimple_h-.1]) cylinder(r=screw_rad+.75, h=height+10, $fn=72);
+        translate([0,0,motor_dimple_h-.1]) cylinder(r=screw_rad+.333, h=height+10, $fn=72);
         
         //rough in the screw
-        %rotate([0,0,40]) render() translate([0,0,motor_dimple_h]) screw_segment_inset(length=screw_length, starts=2, top=PEG, bot=PEG, screw_rad = screw_rad, step = 36);
+        %rotate([0,0,0]) render() translate([0,0,motor_dimple_h]) screw_segment_inset(length=screw_length, starts=2, top=PEG, bot=PEG, screw_rad = screw_rad, step = 36);
+        
+        //make some leg mounting holes
+        if(legs == true){
+            for(i=[0:360/num_guides:359]) rotate([0,0,i]) {
+                translate([width/2-in*1.5,0,-2]) scale([2,.75,1]) cylinder(r1=guide_rad+.5, r2=guide_rad+.25, h=in/2, $fn=4);
+            }
+        }
+    }
+}
+
+module fountain_leg(height = 70, width = in*5.4){
+    guide_rad = 8;
+    union(){
+        //leg body
+        difference(){
+            rotate([0,0,45])
+            translate([width/2-in*1.5,0,0]) scale([2,.75,1]) minkowski(){
+                cylinder(r1=guide_rad+wall*2, r2=guide_rad+wall, h=height+in/4, $fn=4);
+                sphere(r=1, $fn=6);
+            }
+            translate([0,0,height]) hull() screw_inlet_2(height = screw_length, width = in*7+.25, screw_rad = 19, legs=true);
+        }
+        
+        //leg peg
+        rotate([0,0,45])
+        translate([width/2-in*1.5,0,0]) translate([0,0,height-3]) scale([2,.75,1]) cylinder(r1=guide_rad, r2=guide_rad, h=in/2, $fn=4);
     }
 }
 
