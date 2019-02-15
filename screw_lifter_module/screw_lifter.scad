@@ -4,7 +4,7 @@ use <../clank_drop/clank_drop.scad>;
 use <../screw_drop/bowl_drop.scad>;
 use <../ball_return/ball_return.scad>;
 
-part = 7;
+part = 101;
 
 screw_rad = ball_rad+wall*2;
 screw_pitch = ball_rad*2+wall*2;
@@ -42,6 +42,13 @@ if(part == 777)
 
 if(part == 7777)
     fountain_guide_extension(height = 70, width = in*7);
+
+if(part == 100){
+    two_inch_fountain();
+}
+
+if(part == 101)
+    two_inch_screw();
 
 if(part==10){
     assembled();
@@ -396,6 +403,10 @@ module gear_motor(screws = true){
             }
         }
     }
+}
+
+module two_inch_screw(){
+    screw_segment_inset(length=3, starts=2, top=PEG, bot=MOTOR, screw_rad = in*5, ball_rad = in*2, screw_pitch=in*6.5);
 }
 
 //length is measured in revolutions!
