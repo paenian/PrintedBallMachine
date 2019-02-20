@@ -4,7 +4,7 @@ use <../clank_drop/clank_drop.scad>;
 use <../screw_drop/bowl_drop.scad>;
 use <../ball_return/ball_return.scad>;
 
-part = 88;
+part = 7;
 
 screw_rad = ball_rad+wall*2;
 screw_pitch = ball_rad*2+wall*2;
@@ -279,17 +279,19 @@ module screw_inlet_2(height = screw_length, length = in*5, width = in*5.4, legs=
             if(legs == false){
                 translate([screw_offset,0,0]) difference(){  //box
                     intersection(){
-                        translate([0,0,in/2]) cube([length, width, in], center=true);
+                        translate([0,0,(in*1.5)/2]) cube([length, width, in*1.5], center=true);
                         translate([0,0,motor_dimple_h+wall+in/4]) cylinder(r=in*3.333+wall, h=in*4, center=true, $fn=90);
                     }
                 
                     //slope in towards the screw
                     intersection(){
                         hull(){
-                            translate([0,0,motor_dimple_h+wall+in/4]) cylinder(r=in*3.333, h=in*2, $fn=90);
+                            translate([-screw_offset,0,motor_dimple_h+wall+in/2]) cylinder(r=in*3.333, h=in*2, $fn=90);
                             translate([-screw_offset,0,0]) translate([0,0,motor_dimple_h+wall]) cylinder(r=screw_rad, h=height+10); //this lets the marbles into the screw, too
+                            translate([in*3,0,motor_dimple_h+wall+in*1.5]) cube([in, in*5, in], center=true);
                         }
                         translate([0,0,in]) cube([length-wall*2, width-wall*2, in*2], center=true);
+                        translate([0,0,motor_dimple_h]) cylinder(r=in*3.333, h=in*2, $fn=90);
                     }
                 }
             }else{
@@ -330,7 +332,10 @@ module screw_inlet_2(height = screw_length, length = in*5, width = in*5.4, legs=
             //side holes for the pegboard
             for(j=[-peg_sep,0,peg_sep]) for(i=[0,1]) mirror([0,i,0]) translate([screw_offset-length/2+peg_sep/2+j,width/2,peg_sep/2]) {
                 rotate([90,0,0]) cylinder(r=m5_rad, h=in, center=true);
-                translate([0,-wall,0]) rotate([90,0,0]) rotate([0,0,45]) cylinder(r=m5_sq_nut_rad, h=m5_nut_height, $fn=4);
+                hull(){
+                    translate([0,-wall,0]) rotate([90,0,0]) rotate([0,0,45]) cylinder(r=m5_sq_nut_rad, h=m5_nut_height, $fn=4);
+                    translate([0,-wall,in]) rotate([90,0,0]) rotate([0,0,45]) cylinder(r=m5_sq_nut_rad+1, h=m5_nut_height+1, $fn=4);
+                }
             }
             
             //this is the actual board
@@ -561,7 +566,7 @@ module screw_segment_inset(length = 4, starts = 2, top = PEG, bot = PEG, screw_r
 module screw_segment_peg(){
     peg_len = 20;
     
-    rotate([90,0,0])  d_slot(shaft=9-.333, height=peg_len-.2, dflat=.4+.4+.2, round_inset = 0, round_height = 0, double_d=true);
+    rotate([90,0,0])  d_slot(shaft=9-.5, height=peg_len-.2, dflat=.4+.4+.2, round_inset = 0, round_height = 0, double_d=true);
 }
 
 //length is measured in revolutions!
