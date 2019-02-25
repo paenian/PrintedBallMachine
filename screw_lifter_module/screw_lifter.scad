@@ -321,6 +321,15 @@ module screw_inlet_2(height = screw_length, length = in*5, width = in*5.4, legs=
                     }
                 }
             }else{
+                //widen the bases to restrict marble entry
+                *for(i=[45:360/num_guides:359]) rotate([0,0,i]) {
+                    hull(){
+                        translate([screw_rad+guide_rad*.5,0,0]) scale([2,.75,1]) cylinder(r=guide_rad*1.2, h=in, $fn=4);
+                        translate([screw_rad+guide_rad*1.5,0,0]) scale([2,.75,1]) cylinder(r=guide_rad, h=in*3, $fn=4);
+                        
+                        %rotate([0,0,45]) translate([screw_rad,0,in]) sphere(r=ball_rad+1);
+                    }
+                }
                 for(i=[0,1]) mirror([0,i,0]) rotate([0,0,45]) translate([screw_rad+guide_rad*1.5,0,0]) scale([2,.75,1]) cylinder(r=guide_rad, h=height, $fn=4);
                 
                 hull() for(i=[0,1]) mirror([0,i,0]) rotate([0,0,135]) translate([screw_rad+guide_rad*1.5,0,0]) scale([2,.75,1]) cylinder(r=guide_rad, h=height, $fn=4);
@@ -347,6 +356,16 @@ module screw_inlet_2(height = screw_length, length = in*5, width = in*5.4, legs=
                 rotate([0,90,0]) rotate([0,0,-90]) cap_cylinder(r=3, h=in/2);
                 translate([in/2-.1,0,0]) rotate([0,90,0]) cylinder(r1=3, r2=6, h=3.05);
                 translate([in/2+3-.1,0,0]) rotate([0,90,0]) rotate([0,0,-90]) cap_cylinder(r=6, h=10);
+            }
+        }
+        
+        //some sloped marble entries
+        if(legs == false){
+            for(i=[0:360/num_guides:359*((num_guides-1)/num_guides)]) rotate([0,0,i-90-10]) {
+                hull(){
+                    translate([screw_rad-2,0,ball_rad+1+motor_dimple_h]) sphere(r=ball_rad+1);
+                    translate([screw_rad*3,0,ball_rad+2+motor_dimple_h+1+in/3.5]) sphere(r=ball_rad+1);
+                }
             }
         }
         
