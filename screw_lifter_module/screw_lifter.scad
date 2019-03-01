@@ -4,7 +4,7 @@ use <../clank_drop/clank_drop.scad>;
 use <../screw_drop/bowl_drop.scad>;
 use <../ball_return/ball_return.scad>;
 
-part = 7;
+part = 72;
 
 screw_rad = ball_rad*1.5+wall*2;
 screw_pitch = ball_rad*2+wall*3;
@@ -28,15 +28,21 @@ if(part == 5)
     rotate([0,90,0]) rear_ball_return_inlet();
 if(part == 6)
     rotate([0,-90,0]) rear_ball_return_outlet();
-if(part == 7)
-    screw_direct_inlet();
+
 
 if(part == 7)
     screw_inlet_2(height = 5, width = in*5.45, screw_rad = 19, num_guides = 4);
+
 if(part == 71){
     %screw_inlet_2(height = 5, width = in*5.45, screw_rad = 19, num_guides = 4);
     
     translate([0,0,5*(screw_pitch+5)]) screw_inlet_2_extender(height = 5, width = in*5.45, screw_rad = 19, num_guides = 4);
+}
+
+if(part == 72){
+    %screw_inlet_2(height = 5, width = in*5.45, screw_rad = 19, num_guides = 4);
+    
+    translate([0,0,5*(screw_pitch+5)]) screw_inlet_2_top(height = 5, screw_rad = 19, num_guides = 4);
 }
 
 if(part == 8)
@@ -441,6 +447,101 @@ module screw_inlet_2(height = screw_length, length = in*5, width = in*5.4, legs=
                 translate([width/2-in*1.5,0,-2]) scale([2,.75,1]) cylinder(r1=guide_rad+.5, r2=guide_rad+.25, h=in/2, $fn=4);
             }
         }
+    }
+}
+
+module screw_inlet_2_top(height = 5, width = in*5.45+peg_thick*2, length = in*4, screw_rad = 19, num_guides = 4){
+        
+    pitch = screw_pitch+5;
+    height = screw_length*pitch;
+    
+    guide_rad = 8;
+    
+    screw_offset = length/2-screw_rad-wall;
+    
+    extend_inset = 7;
+    
+    overhang = (width-in*5.45)/2-peg_thick;
+    
+    difference(){
+        union(){
+            //box
+            translate([screw_offset-wall,overhang,-extend_inset]) difference(){            
+                intersection(){
+                    translate([0,0,(in*1.5)/2]) cube([length, width, in*1.5], center=true);
+                    translate([0,0,6+wall+in/4]) cylinder(r=in*3.33+wall, h=in*4, center=true, $fn=90);
+                }
+                
+                intersection(){
+                    intersection(){
+                        translate([0,0,(in*1.5)/2+wall]) cube([length-wall*2, width-wall*2, in*1.5], center=true);
+                        translate([0,0,6+wall+in/4+wall]) cylinder(r=in*3.33, h=in*4, center=true, $fn=90);
+                    }
+                    
+                    hull(){
+                        //ball exit
+                        translate([-length/2+wall+ball_rad+wall/2,width/2-wall/2,ball_rad+wall/2+wall]) sphere(r=ball_rad+wall/2);
+                        
+                        //opposite board corner
+                        translate([-length/2+wall+ball_rad+wall/2,-width/2+wall/2,ball_rad+wall/2+wall*6]) sphere(r=ball_rad+wall/2);
+                        
+                        //kiddy corner
+                        translate([length/2-wall,-width/2+wall/2,ball_rad+wall/2+wall*4]) sphere(r=ball_rad+wall/2);
+                        
+                        //opposite board corner
+                        translate([length/2-wall,width/2-wall/2,ball_rad+wall/2+wall*2]) sphere(r=ball_rad+wall/2);
+                        translate([0,0,in*4]) cube([length, width, in*1.5], center=true);
+                    }
+                }
+            }
+            
+            //descent slope from marblering
+            translate([0,0,-extend_inset]) scale([1,1,1]) difference(){
+                hull(){
+                    cylinder(r=screw_rad+ball_rad/2, h=extend_inset+wall*6, $fn=18);
+                    cylinder(r=screw_rad+guide_rad*3+wall*2, h=extend_inset+wall, $fn=36);
+                }
+                
+                //cylinder(r=screw_rad+guide_rad*3-wall, h=extend_inset*2+.1, center=true);
+            }
+        }
+        
+        //hollow the inset out
+        for(i=[0,1]) mirror([0,i,0]) rotate([0,0,45]) translate([screw_rad+guide_rad*1.5,0,-extend_inset-.1]) scale([2,.75,1]){
+            cylinder(r=guide_rad+.222, h=extend_inset*5, $fn=4);
+        }
+        
+        difference(){
+            hull() for(i=[0,1]) mirror([0,i,0]) rotate([0,0,135]) translate([screw_rad+guide_rad*1.5,0,-extend_inset-.1]) scale([2,.75,1]) cylinder(r=guide_rad+.222, h=extend_inset*9, $fn=4);
+            translate([screw_offset-length/2-peg_sep/2,0,0]) cube([in*3/4, width+.1, in*50], center=true);
+        }
+        
+        //ball exit
+        translate([screw_offset-wall,overhang,-extend_inset]) hull(){
+            translate([-length/2+wall+ball_rad+wall,width/2-wall,ball_rad+wall/2+wall]) sphere(r=ball_rad+wall/2+1);
+            translate([-length/2+wall+ball_rad+peg_sep,width/2-wall,ball_rad+wall/2+wall]) sphere(r=ball_rad+wall/2+1);
+            translate([-length/2+wall+ball_rad+wall,width/2+in/2,ball_rad+wall/2+wall]) sphere(r=ball_rad+wall/2+2);
+        }
+        
+        //the screw
+        translate([0,0,-.1-extend_inset]) cylinder(r=screw_rad+.333, h=height+10, $fn=72);
+        
+        //balls
+        for(i=[30:90:290]) rotate([0,0,180+45+i]) translate([screw_rad-ball_rad/2,0,-extend_inset-1]) difference(){
+            hull(){
+                cylinder(r=ball_rad+1, h=extend_inset*5);
+            }
+        }
+        
+        //screw into the board top
+        for(i=[0,1]) mirror([0,i,0]) translate([screw_offset-length/2-peg_sep/2,13,-extend_inset-.1]) {
+            cylinder(r=3, h=in);
+            translate([0,0,wall]) cylinder(r1=3, r2=6, h=3.05);
+            translate([0,0,wall+3]) cylinder(r=6, h=in);
+        }
+        
+        //this is the actual board
+        %translate([screw_offset-length/2-peg_sep/2,0,0]) cube([in*3/4, in*5.45+.1, in*50], center=true);
     }
 }
 
