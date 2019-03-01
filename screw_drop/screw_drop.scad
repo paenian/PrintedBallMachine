@@ -251,15 +251,6 @@ module bearing(bearing=true, drive_gear=false){
         
 }
 
-module d_slot(shaft=6, height=10, tolerance = .2, dflat=.25, $fn=30){
-    translate([0,0,-.1]){
-       difference(){ 
-           cylinder(r1=shaft/2+tolerance, r2=shaft/2+tolerance/2, h=height+.01);
-           translate([-shaft/2,shaft/2-dflat,0]) cube([shaft, shaft, height+.01]);
-           translate([-shaft/2,-shaft/2-shaft+dflat,0]) cube([shaft, shaft, height+.01]);
-       }
-    }
-}
 
 //next section
 %translate([in*9,0,in]) inlet(height=5);

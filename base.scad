@@ -668,7 +668,8 @@ module d_slot(shaft=6, height=10, tolerance = .2, dflat=.25, double_d=false, rou
        difference(){ 
            cylinder(r=shaft/2+tolerance, h=height+.01);
            translate([-shaft/2,shaft/2-dflat,0]) cube([shaft, shaft, height+.01]);
-           if(double_d==true){
+           echo(double_d);
+           if(double_d == true){
                mirror([0,1,0]) translate([-shaft/2,shaft/2-dflat,0]) cube([shaft, shaft, height+.01]);
            }
            
@@ -728,4 +729,15 @@ module motorHoles(solid=1, motor_bump=4, support=false, slot=0, top_rad = 3.1){
             }
        }
    }       
+}
+
+//a cylinder with a flat on top - for drawing vertical holes.
+module cap_cylinder(r=1, h=1, center=false){
+	render() union(){
+		cylinder(r=r, h=h, center=center);
+		intersection(){
+			rotate([0,0,22.5]) cylinder(r=r/cos(180/8), h=h, $fn=8, center=center);
+			translate([0,-r/cos(180/4),0]) rotate([0,0,0]) cylinder(r=r/cos(180/4), h=h, $fn=4, center=center);
+		}
+	}
 }
