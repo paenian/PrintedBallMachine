@@ -508,11 +508,11 @@ module screw_inlet_2_top(height = 5, width = in*5.45+peg_thick*2, length = in*4,
         
         //hollow the inset out
         for(i=[0,1]) mirror([0,i,0]) rotate([0,0,45]) translate([screw_rad+guide_rad*1.5,0,-extend_inset-.1]) scale([2,.75,1]){
-            cylinder(r=guide_rad+.222, h=extend_inset*5, $fn=4);
+            cylinder(r=guide_rad+.3, h=extend_inset*5, $fn=4);
         }
         
         difference(){
-            hull() for(i=[0,1]) mirror([0,i,0]) rotate([0,0,135]) translate([screw_rad+guide_rad*1.5,0,-extend_inset-.1]) scale([2,.75,1]) cylinder(r=guide_rad+.222, h=extend_inset*9, $fn=4);
+            hull() for(i=[0,1]) mirror([0,i,0]) rotate([0,0,135]) translate([screw_rad+guide_rad*1.5,0,-extend_inset-.1]) scale([2,.75,1]) cylinder(r=guide_rad+.3, h=extend_inset*9, $fn=4);
             translate([screw_offset-length/2-peg_sep/2,0,0]) cube([in*3/4, width+.1, in*50], center=true);
         }
         
