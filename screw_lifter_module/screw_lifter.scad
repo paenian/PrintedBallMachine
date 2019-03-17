@@ -4,7 +4,7 @@ use <../clank_drop/clank_drop.scad>;
 use <../screw_drop/bowl_drop.scad>;
 use <../ball_return/ball_return.scad>;
 
-part = 72;
+part = 103;
 
 screw_rad = ball_rad*1.5+wall*2;
 screw_pitch = ball_rad*2+wall*3;
@@ -75,6 +75,15 @@ if(part == 100){
 
 if(part == 101)
     two_inch_screw();
+
+if(part == 102)
+    two_inch_screw_plug();
+
+if(part == 103)
+    two_inch_screw_base();
+
+if(part == 110)
+    two_inch_screw_assembled();
 
 if(part==10){
     assembled();
@@ -666,14 +675,189 @@ module gear_motor(screws = true){
     }
 }
 
+module two_inch_screw_assembled(){
+    thrust_inner_rad = 25/2;
+    thrust_flange_rad = 38/2;
+    thrust_rad = 52/2;
+    thrust_flat_rad = 42/2;
+    thrust_thick = 17;
+    
+    rod_rad = 15/2+.25;
+    bearing_rad = 35/2+.25;
+    bearing_thick = 11.75;
+    screw_rad = in*2.5+.75; //large clearance on the screw
+    
+    base_rad = in*5.25;
+    base_height = in*1.75;
+    screw_ring = 10;
+    
+    wall = 4;
+    
+    difference(){
+        union(){
+            render() two_inch_screw_base();
+            render() translate([0,0,wall+bearing_thick-wall-.5]) two_inch_screw_plug();
+            render() translate([0,0,wall+bearing_thick+wall+1]) two_inch_screw();
+        }
+    
+        //cut in half for a test view
+        translate([500,0,0]) cube([1000,1000,1000], center=true);
+    }
+}
+
+//this attaches the bottom screw to the base, inside of a thust bearing.
+module two_inch_screw_plug(){
+    thrust_inner_rad = 25/2;
+    thrust_fange_rad = 38/2;
+    rod_rad = 15/2+.25;
+    bearing_rad = 35/2+.25;
+    bearing_thick = 11.75;
+    
+    
+    difference(){
+        union(){
+            cylinder(r=thrust_inner_rad-.4, h=10.1);
+            translate([0,0,10]) cylinder(r=bearing_rad-.5, h=bearing_thick/2-1+.1);
+            translate([0,0,10+bearing_thick/2-1]) cylinder(r=bearing_rad-.5, h=bearing_thick, $fn=6);
+        }
+        
+        cylinder(r=rod_rad+2, h=100);
+    }
+}
+
+module rod_hole(height = 100){
+    rod_rad = 15/2;
+    rod_wall = 2.6+.2;
+    
+    union(){
+        difference(){
+            union(){
+                cylinder(r=rod_rad+.3, h=height);
+            }
+            translate([0,0,-.1]) cylinder(r1=rod_rad-rod_wall, r2=rod_rad-rod_wall*1.5, h=height+1);
+        }
+        translate([rod_rad-rod_wall-m5_rad+.25,0,0]) {
+            translate([0,0,-wall/2+.3]) cylinder(r=m5_rad, h=height);
+            rotate([180,0,0]) translate([0,0,wall/2]) cylinder(r=m5_cap_rad, h=height*2);
+        }
+    }
+}
+
+//a nice base for the screw to sit in. Edge is flat so we can add more bowl to it.
+module two_inch_screw_base(){
+    high_facets = 108;
+    
+    thrust_inner_rad = 25/2;
+    thrust_flange_rad = 38/2;
+    thrust_rad = 52/2;
+    thrust_flat_rad = 42/2;
+    thrust_thick = 17;
+    
+    rod_rad = 15/2+.25;
+    bearing_rad = 35/2+.25;
+    bearing_thick = 11.75;
+    screw_rad = in*2.5+.75; //large clearance on the screw
+    
+    base_rad = in*5.25;
+    base_height = in*1.75;
+    screw_ring = 10;
+    
+    wall = 4;
+    
+    %translate([screw_rad+in,0,in*3]) sphere(r=in);
+    
+    difference(){
+        union(){
+            difference(){
+                cylinder(r1=base_rad-base_height, r2=base_rad, h=base_height);
+                
+                //todo:remove some chunks?
+                *for(i=[60:360/3:359]) rotate([0,0,i]) {
+                    hull(){
+                        translate([thrust_rad+rod_rad+wall,0,-.1]) cylinder(r=rod_rad, h=thrust_thick);
+                        translate([base_rad,0,-.1]) cylinder(r=base_rad/2, h=thrust_thick);
+                    }
+                }
+            }
+        }
+        
+        //slope inwards
+        intersection(){
+            translate([0,0,wall+thrust_thick]) cylinder(r1=base_rad-base_height/2, r2=base_rad-screw_ring, h=base_height-wall-thrust_thick+.1);
+            //translate([0,0,base_height]) scale([1,1,(base_height-wall*2-thrust_thick)/(base_rad-screw_ring)]) sphere(r=base_rad-screw_ring, $fn=high_facets);
+            translate([0,0,wall*1.5+thrust_thick]) cylinder(r1=screw_rad, r2=base_rad-screw_ring, h=base_height-wall-thrust_thick+.1);
+        }
+        
+        
+        //the screw inset
+        translate([0,0,wall+thrust_thick-.5]) cylinder(r=screw_rad, h=base_height, $fn=high_facets);
+        
+        //screws to attach more rings
+        for(i=[0:360/6:359]) rotate([0,0,i]) translate([base_rad-screw_ring*.75,0,base_height]) {
+            translate([0,0,-wall+.3]) cylinder(r=m5_rad, h=base_height);
+            rotate([180,0,0]) translate([0,0,wall]) cylinder(r=m5_nut_rad, h=base_height, $fn=6);
+        }
+        
+        //thrust bearing hole
+        translate([0,0,wall]) 
+        difference(){
+            union(){
+                cylinder(r=thrust_rad+.25, h=base_height);
+                translate([0,0,-wall/2]) cylinder(r=thrust_flat_rad-.25, h=base_height);
+            }
+            
+            translate([0,0,-wall/2-.1]) cylinder(r=thrust_inner_rad-1, h=thrust_thick/2);
+        }
+        
+        //rod holes
+        translate([0,0,wall]){
+            rod_hole();
+            for(i=[0:360/3:359]) rotate([0,0,i]) translate([screw_rad+rod_rad+.5,0,0]) rod_hole();
+        }
+        
+        //cut in half for a test view
+        *translate([500,0,0]) cube([1000,1000,1000], center=true);
+    }
+}
+
 module two_inch_screw(){
-    screw_segment_inset(length=3, starts=2, top=PEG, bot=MOTOR, screw_rad = in*5, ball_rad = in*2, screw_pitch=in*6.5);
+    joint = 15;
+    pitch = in*3;
+    rad = in*2.5;
+    length = 3;
+    
+    rod_rad = 15/2+.25;
+    bearing_rad = 35/2+.25;
+    bearing_thick = 11.75;
+    
+    
+    difference(){
+        screw_segment_inset(length=length, starts=2, top=NONE, bot=NONE, screw_rad = rad, ball_rad = in, screw_pitch=pitch);
+        
+        //lock the next segment in
+        for(j=[0,1]) for(i=[0,1]) mirror([0,i,0]) translate([0,bearing_rad+joint/2+1,j*pitch*length]) cube([joint+.4, joint+.4, joint+1], center=true);
+    
+        //rod/bearing support
+        translate([0,0,-.5]) cylinder(r=bearing_rad, h=pitch*length+1, $fn=6);
+        
+        //bearing top and bottom
+        translate([0,0,pitch*length/2])
+        for(i=[0,1]) mirror([0,0,i]) translate([0,0,pitch*length/2]){
+            cylinder(r=bearing_rad, h=bearing_thick, center=true);
+            *hull(){
+                cylinder(r=bearing_rad, h=bearing_thick*2, center=true, $fn=6);
+                cylinder(r=rod_rad+1, h=bearing_thick*6, center=true);
+            }
+        }
+        
+        echo(pitch*3);
+    }
 }
 
 //length is measured in revolutions!
 //this is a differenced version, all around the marble.
 module screw_segment_inset(length = 4, starts = 2, top = PEG, bot = PEG, screw_rad = 19, step = 18){
-    pitch = screw_pitch+5;
+    pitch = screw_pitch;
     true_pitch = pitch*starts;
     
     screw_ball_rad = ball_rad+1;
