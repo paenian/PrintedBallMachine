@@ -15,6 +15,10 @@ bearing_rad = 35/2+.25;
 rod_rad = 15/2+.25;
 screw_rad = in*2.5+.75;
 rod_ring_rad = screw_rad+rod_rad+.5;
+bearing_rad = 35/2+.25;
+bearing_thick = 11.75;
+joint = 15;
+    
 //these are the pegs to secure the stationary ring gear
 for(i=[0:360/3:359]) rotate([0,0,i]) translate([rod_ring_rad,0,0])
     %cylinder(r=rod_rad, h=50);
@@ -23,7 +27,7 @@ for(i=[0:360/3:359]) rotate([0,0,i]) translate([rod_ring_rad,0,0])
 choose(export);
 
 // choose the object to render
-export=0;// [0:Input,1:Output]
+export=1;// [0:Input,1:Output]
 // outer diameter of ring
 D=in*5.25;
 //chamfer radius on the gears
@@ -89,15 +93,25 @@ module ring()
 difference(){
 	union(){
 		difference(){
-			cylinder(r=D/2*nr2/nr,h=T/2+1,$fn=100);
-			translate([0,0,1])gear(nr2,pitch,P,DR,-tol,helix_angle,T/2+0.2);
+			cylinder(r=D/2*nr2/nr-1,h=T/2+3,$fn=100);
+			translate([0,0,3])gear(nr2,pitch,P,DR,-tol,helix_angle,T/2+0.2);
 		}
 		cylinder(r=0.9*innerR(ns,pitch,P,tol,DR),h=T/2+1);
 		cylinder(r=w/3,h=T/2+1+3*vtol);
 	}
 	translate([0,0,-1])cylinder(r=w/sqrt(3),h=T,center=true,$fn=6);
-	for(i=[1:3])rotate([0,0,i*120])translate([pitchD/2*(ns+np)/nr,0,0])
-		cylinder(r=innerR(np2,pitch,P,tol,DR),h=3,center=true);
+	for(i=[1:6])rotate([0,0,i*60])translate([pitchD/2*(ns+np)/nr-3.5,0,0])
+		cylinder(r=innerR(np2,pitch,P,tol,DR)+2,h=11,center=true);
+    
+    //bearing support
+    translate([0,0,-.5]) cylinder(r=bearing_rad, h=T*7, $fn=6, center=true);
+    translate([0,0,0]) cylinder(r=bearing_rad, h=bearing_thick, center=true);
+    
+    //holes to lock to the screw
+    for(i=[30:360/6:359]) rotate([0,0,i]) translate([22,0,0]) {
+        cylinder(r=3.4/2, h=T*2, center=true, $fn=30);
+        translate([0,0,2]) cylinder(r=4, h=T*2, $fn=30);
+    }
 }
 
 module planetary()
@@ -113,6 +127,13 @@ translate([0,0,T/2]){
         //these are the pegs to secure the stationary ring gear
         for(i=[0:360/3:359]) rotate([0,0,i]) translate([rod_ring_rad,0,0])
             cylinder(r=rod_rad, h=T*5, center=true);
+        
+        //let's put some zip ties in there for good measure
+        for(i=[0:360/3:359]) rotate([0,0,i]) translate([rod_ring_rad,0,0]) {
+            rotate_extrude(){
+                translate([rod_rad+4, 0, 0]) square([2,4], center=true);
+            }
+        }
 	}
     
     //sun gear
@@ -125,7 +146,13 @@ translate([0,0,T/2]){
         translate([0,0,-T/2]) rotate_extrude(){
             translate([pitchR(ns,pitch)+rackDepth(pitch,P)/2+max(-tol,0), 0, 0]) circle(r=chamfer, $fn=4);
         }
+        for(i=[30:360/6:359]) rotate([0,0,i]) translate([22,0,0]) {
+            cylinder(r=3.4/2, h=T*2, center=true, $fn=30);
+        }
         
+        //bearing support
+        translate([0,0,-.5]) cylinder(r=bearing_rad, h=T*7, $fn=6, center=true);
+        translate([0,0,-T/2]) cylinder(r=bearing_rad, h=bearing_thick, center=true);
 	}
 	for(i=[1:m])rotate([0,0,i*360/m+phi])translate([pitchD/2*(ns+np)/nr,0,0])
 		rotate([0,0,-phi*(ns+np)/np-phi]){

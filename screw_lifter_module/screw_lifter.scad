@@ -946,10 +946,16 @@ module two_inch_screw_exit(){
     %translate([0,0,-pitch*3]) two_inch_screw();    
     
     difference(){
-        screw_segment_inset(length=length, starts=2, top=NONE, bot=NONE, screw_rad = rad, ball_rad = in, screw_pitch=pitch, taper = in*1.5, extra_steps = 5);
+        screw_segment_inset(length=length, starts=2, top=NONE, bot=NONE, screw_rad = rad, ball_rad = in, screw_pitch=pitch, taper = in*2, extra_steps = 5);
         
-        //lock the next segment in
-        for(j=[0,1]) for(i=[0,1]) mirror([0,i,0]) translate([0,bearing_rad+joint/2+1,j*pitch*length]) cube([joint+.4, joint+.4, joint+1], center=true);
+        //lock the previous segment in
+        for(i=[0,1]) mirror([0,i,0]) translate([0,bearing_rad+joint/2+1,0]) cube([joint+.4, joint+.4, joint+1], center=true);
+            
+        //top has a screw ring instead
+        //holes to lock to the screw
+    for(i=[30:360/6:359]) rotate([0,0,i]) translate([22,0,pitch*length]) {
+        cylinder(r1=2.9/2, r2=3.3/2, h=in, center=true, $fn=30);
+    }
     
         //rod/bearing support
         translate([0,0,-.5]) cylinder(r=bearing_rad, h=pitch*length+1, $fn=6);
@@ -1027,11 +1033,11 @@ module screw_segment_inset(length = 4, starts = 2, top = PEG, bot = PEG, screw_r
         for(j=[1:starts]) rotate([0,0,j*(360/starts)]) translate([0,0,0]) {
             for(i=[step*extra_steps:step:360*length-step-1]) {
                 hull(){
-                    rotate([0,0,i]) translate([screw_rad+screw_ball_rad-inset + i*true_taper, 0, i/360*true_pitch]) sphere(r=screw_ball_rad);
-                    rotate([0,0,i+step]) translate([screw_rad+screw_ball_rad-inset + (i+step)*true_taper, 0, (i+step)/360*true_pitch]) sphere(r=screw_ball_rad);
+                    rotate([0,0,i]) translate([screw_rad+screw_ball_rad-inset + (i-step*extra_steps)*true_taper, 0, i/360*true_pitch]) sphere(r=screw_ball_rad);
+                    rotate([0,0,i+step]) translate([screw_rad+screw_ball_rad-inset + (i-step*extra_steps+step)*true_taper, 0, (i+step)/360*true_pitch]) sphere(r=screw_ball_rad);
                     
                     //expansion up and out
-                    rotate([0,0,i]) translate([screw_rad+screw_ball_rad*4-inset + i*true_taper, 0, screw_ball_rad*2+i/360*true_pitch]) sphere(r=screw_ball_rad);
+                    rotate([0,0,i]) translate([screw_rad+screw_ball_rad*4-inset + (i-step*extra_steps)*true_taper, 0, screw_ball_rad*2+i/360*true_pitch]) sphere(r=screw_ball_rad);
                     rotate([0,0,i+step]) translate([screw_rad+screw_ball_rad*4-inset + (i+step)*true_taper, 0, screw_ball_rad*2+(i+step)/360*true_pitch]) sphere(r=screw_ball_rad);
                 }
             }
