@@ -4,7 +4,9 @@ use <../clank_drop/clank_drop.scad>;
 use <../screw_drop/bowl_drop.scad>;
 use <../ball_return/ball_return.scad>;
 
-part = 103;
+part = 105;
+
+%cylinder(r=in*1.5, h=in*10);
 
 screw_rad = ball_rad*1.5+wall*2;
 screw_pitch = ball_rad*2+wall*3;
@@ -81,6 +83,15 @@ if(part == 102)
 
 if(part == 103)
     two_inch_screw_base();
+
+if(part == 104)
+    two_inch_screw_collar();
+
+if(part == 105)
+    two_inch_screw_exit();
+
+if(part == 106)
+    two_inch_screw_boxpeg();
 
 if(part == 110)
     two_inch_screw_assembled();
@@ -693,11 +704,15 @@ module two_inch_screw_assembled(){
     
     wall = 4;
     
+    %cylinder(r=in*1.5, h=in*24);
+    
     difference(){
         union(){
             render() two_inch_screw_base();
             render() translate([0,0,wall+bearing_thick-wall-.5]) two_inch_screw_plug();
             render() translate([0,0,wall+bearing_thick+wall+1]) two_inch_screw();
+            translate([0,0,in*5]) two_inch_screw_collar();
+            translate([0,0,in*9+wall+bearing_thick+wall+2]) two_inch_screw_exit();
         }
     
         //cut in half for a test view
@@ -743,6 +758,59 @@ module rod_hole(height = 100){
     }
 }
 
+module two_inch_screw_collar(thick = 13){
+    high_facets = 108;
+    
+    thrust_inner_rad = 25/2;
+    thrust_flange_rad = 38/2;
+    thrust_rad = 52/2;
+    thrust_flat_rad = 42/2;
+    thrust_thick = 17;
+    
+    rod_rad = 15/2+.25;
+    bearing_rad = 35/2+.25;
+    bearing_thick = 11.75;
+    screw_rad = in*2.5+.75; //large clearance on the screw
+    rod_ring_rad = screw_rad+rod_rad+.5;
+    
+    base_rad = in*5.25;
+    base_height = in*1.75;
+    screw_ring = 10;
+    
+    wall = 4;
+    
+    collar_rad = rod_ring_rad + rod_rad + thick;
+    
+    difference(){
+        union(){
+            cylinder(r=collar_rad, h=thick);
+        }
+        
+        //hole with bumps
+        difference(){
+            translate([0,0,-.5]) cylinder(r=rod_ring_rad+rod_rad, h=thick+1);
+            translate([0,0,-1]) for(i=[0:360/3:359]) rotate([0,0,i]) translate([rod_ring_rad,0,0]) {
+                hull(){
+                    cylinder(r=rod_rad+wall*1.5, h=thick+2);
+                    translate([rod_rad+wall,0,0]) cylinder(r=rod_rad+wall*3, h=thick+2);
+                }
+            }
+        }
+        
+        //rod holes
+        translate([0,0,-1]) for(i=[0:360/3:359]) rotate([0,0,i]) translate([rod_ring_rad,0,0]){
+            cylinder(r=rod_rad+.5, h=thick+2);
+            //zip tie attach
+            translate([0,0,thick/2+1]) rotate_extrude(){
+                translate([rod_rad+wall,0,0]) square([2.5, 4.5], center=true);
+            }
+        }
+        
+        //cutout the center
+        translate([0,0,-.5]) cylinder(r=rod_ring_rad, h=thick+1);
+    }
+}
+
 //a nice base for the screw to sit in. Edge is flat so we can add more bowl to it.
 module two_inch_screw_base(){
     high_facets = 108;
@@ -757,6 +825,7 @@ module two_inch_screw_base(){
     bearing_rad = 35/2+.25;
     bearing_thick = 11.75;
     screw_rad = in*2.5+.75; //large clearance on the screw
+    rod_ring_rad = screw_rad+rod_rad+.5;
     
     base_rad = in*5.25;
     base_height = in*1.75;
@@ -812,7 +881,7 @@ module two_inch_screw_base(){
         //rod holes
         translate([0,0,wall]){
             rod_hole();
-            for(i=[0:360/3:359]) rotate([0,0,i]) translate([screw_rad+rod_rad+.5,0,0]) rod_hole();
+            for(i=[0:360/3:359]) rotate([0,0,i]) translate([rod_ring_rad,0,0]) rod_hole();
         }
         
         //cut in half for a test view
@@ -854,9 +923,54 @@ module two_inch_screw(){
     }
 }
 
+module two_inch_screw_boxpeg(){
+    joint = 15;
+    
+    hull(){
+        cube([joint-1, joint-1, joint], center=true);
+        cube([joint-1, joint, joint-1], center=true);
+        cube([joint, joint-1, joint-1], center=true);        
+    }
+}
+
+module two_inch_screw_exit(){
+    joint = 15;
+    pitch = in*3;
+    rad = in*2.5;
+    length = 1.25;
+    
+    rod_rad = 15/2+.25;
+    bearing_rad = 35/2+.25;
+    bearing_thick = 11.75;
+    
+    %translate([0,0,-pitch*3]) two_inch_screw();    
+    
+    difference(){
+        screw_segment_inset(length=length, starts=2, top=NONE, bot=NONE, screw_rad = rad, ball_rad = in, screw_pitch=pitch, taper = in*1.5, extra_steps = 5);
+        
+        //lock the next segment in
+        for(j=[0,1]) for(i=[0,1]) mirror([0,i,0]) translate([0,bearing_rad+joint/2+1,j*pitch*length]) cube([joint+.4, joint+.4, joint+1], center=true);
+    
+        //rod/bearing support
+        translate([0,0,-.5]) cylinder(r=bearing_rad, h=pitch*length+1, $fn=6);
+        
+        //bearing top and bottom
+        translate([0,0,pitch*length/2])
+        for(i=[0,1]) mirror([0,0,i]) translate([0,0,pitch*length/2]){
+            cylinder(r=bearing_rad, h=bearing_thick, center=true);
+            *hull(){
+                cylinder(r=bearing_rad, h=bearing_thick*2, center=true, $fn=6);
+                cylinder(r=rod_rad+1, h=bearing_thick*6, center=true);
+            }
+        }
+        
+        echo(pitch*3);
+    }
+}
+
 //length is measured in revolutions!
 //this is a differenced version, all around the marble.
-module screw_segment_inset(length = 4, starts = 2, top = PEG, bot = PEG, screw_rad = 19, step = 18){
+module screw_segment_inset(length = 4, starts = 2, top = PEG, bot = PEG, screw_rad = 19, step = 18, taper = 0, extra_steps = 0){
     pitch = screw_pitch;
     true_pitch = pitch*starts;
     
@@ -865,11 +979,15 @@ module screw_segment_inset(length = 4, starts = 2, top = PEG, bot = PEG, screw_r
     echo("RAD");
     echo(screw_ball_rad);
     
+    
+    
     screw_inner_rad = (7.5+wall)/2;
     
     //#cylinder(r=screw_rad, h=50);
     
     peg_len = 20;
+    
+    true_taper = taper / (360*length-step-1);
     
   
     %rotate([0,0,step*7]) translate([screw_rad+screw_ball_rad-inset, 0, step*7/360*true_pitch-(screw_ball_rad-ball_rad)]) sphere(r=ball_rad);
@@ -891,9 +1009,9 @@ module screw_segment_inset(length = 4, starts = 2, top = PEG, bot = PEG, screw_r
             }
         }
         
-        //cut paths into the side - trying to make it bind less
-        for(j=[1:starts]) rotate([0,0,j*(360/starts)]) translate([0,0,-pitch]) {
-            for(i=[0:step:360*length-step-1]) {
+        //cut paths into the underside - leading up to the screw for one turn
+        for(j=[1:starts]) rotate([0,0,j*(360/starts)]) translate([0,0,-pitch*starts]) {
+            for(i=[0:step:360-1+step*extra_steps]) {
                 hull(){
                     rotate([0,0,i]) translate([screw_rad+screw_ball_rad-inset, 0, i/360*true_pitch]) sphere(r=screw_ball_rad);
                     rotate([0,0,i+step]) translate([screw_rad+screw_ball_rad-inset, 0, (i+step)/360*true_pitch]) sphere(r=screw_ball_rad);
@@ -901,6 +1019,20 @@ module screw_segment_inset(length = 4, starts = 2, top = PEG, bot = PEG, screw_r
                     //expansion up and out
                     rotate([0,0,i]) translate([screw_rad+screw_ball_rad*4-inset, 0, screw_ball_rad*2+i/360*true_pitch]) sphere(r=screw_ball_rad);
                     rotate([0,0,i+step]) translate([screw_rad+screw_ball_rad*4-inset, 0, screw_ball_rad*2+(i+step)/360*true_pitch]) sphere(r=screw_ball_rad);
+                }
+            }
+        }
+        
+        //cut paths into the side - trying to make it bind less
+        for(j=[1:starts]) rotate([0,0,j*(360/starts)]) translate([0,0,0]) {
+            for(i=[step*extra_steps:step:360*length-step-1]) {
+                hull(){
+                    rotate([0,0,i]) translate([screw_rad+screw_ball_rad-inset + i*true_taper, 0, i/360*true_pitch]) sphere(r=screw_ball_rad);
+                    rotate([0,0,i+step]) translate([screw_rad+screw_ball_rad-inset + (i+step)*true_taper, 0, (i+step)/360*true_pitch]) sphere(r=screw_ball_rad);
+                    
+                    //expansion up and out
+                    rotate([0,0,i]) translate([screw_rad+screw_ball_rad*4-inset + i*true_taper, 0, screw_ball_rad*2+i/360*true_pitch]) sphere(r=screw_ball_rad);
+                    rotate([0,0,i+step]) translate([screw_rad+screw_ball_rad*4-inset + (i+step)*true_taper, 0, screw_ball_rad*2+(i+step)/360*true_pitch]) sphere(r=screw_ball_rad);
                 }
             }
         }
