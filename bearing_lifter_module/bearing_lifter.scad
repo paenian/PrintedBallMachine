@@ -1,6 +1,6 @@
 include <../configuration.scad>;
 use <../base.scad>;
-use <bearing.scad>;
+use <../bearing.scad>;
 use <../screw_drop/screw_drop.scad>;
 use <../screw_drop/bowl_drop.scad>;
 use <../ball_return/ball_return.scad>;
@@ -13,7 +13,7 @@ hole_rad = 8;
 lift_rad = in*3;
 num_balls = 17;
 
-part = 10;
+part = 2;
 
 //laid out for printing
 if(part == 0)

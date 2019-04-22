@@ -1,12 +1,13 @@
 include <../configuration.scad>;
 use <../base.scad>;
+use <../bearing.scad>;
 use <../clank_drop/clank_drop.scad>;
 use <../screw_drop/bowl_drop.scad>;
 use <../ball_return/ball_return.scad>;
 
-part = 105;
+part = 108;
 
-%cylinder(r=in*1.5, h=in*10);
+//%cylinder(r=in*1.5, h=in*10);
 
 screw_rad = ball_rad*1.5+wall*2;
 screw_pitch = ball_rad*2+wall*3;
@@ -92,6 +93,13 @@ if(part == 105)
 
 if(part == 106)
     two_inch_screw_boxpeg();
+
+if(part == 107)
+    shaft_collar();
+
+if(part == 108)
+    shaft_motor_mount();
+
 
 if(part == 110)
     two_inch_screw_assembled();
@@ -889,6 +897,71 @@ module two_inch_screw_base(){
     }
 }
 
+module shaft_collar(){
+    rod_rad = 15/2+.25;
+    height = 7;
+    gap = 2;
+    bearing_ring_rad = 21/2;
+    ring_bump = 2.5;
+    
+    difference(){
+        hull(){
+            cylinder(r=rod_rad+height, height, center=true);
+            translate([0,0,ring_bump/2]) cylinder(r=bearing_ring_rad, height+ring_bump, center=true);
+            *translate([rod_rad,0,0]) cube([height*2, height*2, height], center=true);
+        }
+        
+        //rod hole
+        cylinder(r=rod_rad, h=height*2, center=true);
+        //gap
+        translate([rod_rad,0,0]) cube([height*3, gap, height*2], center=true);
+        
+        //screwhole
+        translate([rod_rad+m3_rad+.5,0,0]) rotate([-90,0,0]){
+            cap_cylinder(r=m3_rad, h=100, center=true);
+            translate([0,0,gap/2+height/2]) cap_cylinder(r=m3_cap_rad, h=20);
+            mirror([0,0,1]) translate([0,0,gap/2+height/2]) cylinder(r1=m3_nut_rad, r2=m3_nut_rad+1, h=20, $fn=6);
+        }
+    }
+}
+
+module shaft_motor_mount(){
+    rod_rad = 15/2+.25;
+    height = 11;
+    
+    motor_inset = height/2-1;
+    motor_screw_inset = 2.6;
+    gap = 2;
+    bearing_ring_rad = 21/2;
+    ring_bump = 2.5;
+    
+    difference(){
+        hull(){
+            cylinder(r=rod_rad+height, height, center=true);
+            translate([0,0,ring_bump/2]) cylinder(r=bearing_ring_rad, height+ring_bump, center=true);
+            *translate([rod_rad,0,0]) cube([height*2, height*2, height], center=true);
+        }
+        
+        //rod hole
+        cylinder(r=rod_rad, h=height*2, center=true);
+        //gap
+        translate([rod_rad,0,0]) cube([height*3, gap, height*2], center=true);
+        
+        //screwhole
+        translate([rod_rad+m3_rad+.5,0,0]) rotate([-90,0,0]){
+            cap_cylinder(r=m3_rad, h=100, center=true);
+            translate([0,0,gap/2+height/2]) cap_cylinder(r=m3_cap_rad, h=20);
+            mirror([0,0,1]) translate([0,0,gap/2+height/2]) cylinder(r1=m3_nut_rad, r2=m3_nut_rad+1, h=20, $fn=6);
+        }
+        
+        //cut a slot for the motor
+        translate([-10-rod_rad-2,0,10+height/2-motor_inset]) cube([20,40,20], center=true);
+        
+        //motor screw
+        translate([-rod_rad-2-motor_screw_inset,0,0]) cylinder(r=1.8, h=20, center=true);
+    }
+}
+
 module two_inch_screw(){
     joint = 15;
     pitch = in*3;
@@ -937,7 +1010,7 @@ module two_inch_screw_exit(){
     joint = 15;
     pitch = in*3;
     rad = in*2.5;
-    length = 1.25;
+    length = 1.375;
     
     rod_rad = 15/2+.25;
     bearing_rad = 35/2+.25;
@@ -946,7 +1019,7 @@ module two_inch_screw_exit(){
     %translate([0,0,-pitch*3]) two_inch_screw();    
     
     difference(){
-        screw_segment_inset(length=length, starts=2, top=NONE, bot=NONE, screw_rad = rad, ball_rad = in, screw_pitch=pitch, taper = in*2, extra_steps = 5);
+        screw_segment_inset(length=length, starts=2, top=NONE, bot=NONE, screw_rad = rad, ball_rad = in, screw_pitch=pitch, taper = in*2.5, extra_steps = 3);
         
         //lock the previous segment in
         for(i=[0,1]) mirror([0,i,0]) translate([0,bearing_rad+joint/2+1,0]) cube([joint+.4, joint+.4, joint+1], center=true);
