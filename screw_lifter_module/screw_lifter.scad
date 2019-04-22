@@ -929,7 +929,7 @@ module shaft_motor_mount(){
     rod_rad = 15/2+.25;
     height = 11;
     
-    motor_inset = height/2-1;
+    motor_inset = height/2+1;
     motor_screw_inset = 2.6;
     gap = 2;
     bearing_ring_rad = 21/2;

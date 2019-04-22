@@ -19,7 +19,7 @@ motor_rad = 33/2;
 motor_mount_rad = 38/2;
 m3_rad = 1.7;
 gear_inset = in+5.5;
-motor_bump=3.5+1;
+motor_bump=3.5+3;
     
     
 
@@ -153,7 +153,7 @@ module gearsbyteethanddistance(t1=13,t2=51, d=60, teethtwist=1, which=1)
 			}
 			//DIFFERENCE:
             d_height = TT;
-            round_inset = 5;
+            round_inset = 7;
             round_height = 4.5;
             round_rad = 3.25/2;
             #translate([0,0,0]) d_slot(shaft=7.1, height=d_height+round_height+round_inset+5.25, dflat=.725, double_d=true, round_inset=round_inset, round_height=round_height, round_rad=round_rad, $fn=72);
