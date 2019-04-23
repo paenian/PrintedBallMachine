@@ -27,7 +27,7 @@ motor_bump=3.5+3;
 printing = 1;
 
 // OPTIONS COMMON TO BOTH GEARS:
-distance_between_axles = rod_ring_rad;
+distance_between_axles = rod_ring_rad-5;
 gear_h = 10;
 gear_shaft_h = 10;
 
@@ -35,7 +35,7 @@ gear_shaft_h = 10;
 
 // GEAR1 (SMALLER GEAR, STEPPER GEAR) OPTIONS:
 // It's helpful to choose prime numbers for the gear teeth.
-gear1_teeth = 13;				// was 11 for Greg/Wade
+gear1_teeth = 11;				// was 11 for Greg/Wade
 gear1_shaft_d = 5.4;  			// diameter of motor shaft
 gear1_shaft_r  = gear1_shaft_d/2;	
 // gear1 shaft assumed to fill entire gear.
@@ -50,7 +50,7 @@ gear1_captive_nut_h = 2.6;
 
 
 // GEAR2 (LARGER GEAR, DRIVE SHAFT GEAR) OPTIONS:
-gear2_teeth = 73;			// was 45 for Wade/Greg
+gear2_teeth = 87;			// was 45 for Wade/Greg
 gear2_shaft_d = 6.2;		// was 8.3 for Wade/Greg
 gear2_shaft_r  = gear2_shaft_d/2;
 // gear2 has settable outer shaft diameter.

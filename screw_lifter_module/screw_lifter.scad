@@ -5,7 +5,7 @@ use <../clank_drop/clank_drop.scad>;
 use <../screw_drop/bowl_drop.scad>;
 use <../ball_return/ball_return.scad>;
 
-part = 108;
+part = 109;
 
 //%cylinder(r=in*1.5, h=in*10);
 
@@ -100,6 +100,8 @@ if(part == 107)
 if(part == 108)
     shaft_motor_mount();
 
+if(part == 109)
+    two_inch_screw_petal();
 
 if(part == 110)
     two_inch_screw_assembled();
@@ -841,7 +843,7 @@ module two_inch_screw_base(){
     
     wall = 4;
     
-    %translate([screw_rad+in,0,in*3]) sphere(r=in);
+    %rotate([0,0,360/12]) translate([screw_rad+in,0,in*3]) sphere(r=in);
     
     difference(){
         union(){
@@ -897,6 +899,49 @@ module two_inch_screw_base(){
     }
 }
 
+module two_inch_screw_petal(){
+    high_facets = 108;
+    
+    thrust_inner_rad = 25/2;
+    thrust_flange_rad = 38/2;
+    thrust_rad = 52/2;
+    thrust_flat_rad = 42/2;
+    thrust_thick = 17;
+    
+    rod_rad = 15/2+.25;
+    bearing_rad = 35/2+.25;
+    bearing_thick = 11.75;
+    screw_rad = in*2.5+.75; //large clearance on the screw
+    rod_ring_rad = screw_rad+rod_rad+.5;
+    
+    base_rad = in*5.25;
+    base_height = in*1.75;
+    screw_ring = 10;
+    
+    wall = 4;
+    
+    
+    petal_rad = 71;
+    petal_outer_rad = 200;
+    petal_start_rad = base_rad-screw_ring*.75;
+    
+    difference(){
+        union(){
+            intersection(){
+                for(i=[15:360/6:359]) rotate([0,0,i]) translate([0,0,35])
+                    hull(){
+                        cylinder(r=petal_rad/2, h=50);
+                        translate([petal_outer_rad,0,0]) cylinder(r=petal_rad, h=75);
+                    }
+                    
+                cylinder(r1=base_rad-base_height, r2=base_rad*7-(base_rad-base_height)*6, h=base_height*7);
+            }
+        }
+        two_inch_screw_base();
+        translate([0,0,wall*1.5+thrust_thick]) cylinder(r1=screw_rad, r2=(base_rad-screw_ring)*4-screw_rad*3, h=4*(base_height-wall-thrust_thick+.1));
+    }
+}
+
 module shaft_collar(){
     rod_rad = 15/2+.25;
     height = 7;
@@ -927,6 +972,14 @@ module shaft_collar(){
 
 module shaft_motor_mount(){
     rod_rad = 15/2+.25;
+    screw_rad = in*2.5+.75; //large clearance on the screw
+    rod_ring_rad = screw_rad+rod_rad+.5;
+    
+    gear_offset = rod_ring_rad-5;
+    
+    motor_gear_offset = 20;
+    motor_screw_sep = 18;
+    
     height = 11;
     
     motor_inset = height/2+1;
@@ -939,7 +992,8 @@ module shaft_motor_mount(){
         hull(){
             cylinder(r=rod_rad+height, height, center=true);
             translate([0,0,ring_bump/2]) cylinder(r=bearing_ring_rad, height+ring_bump, center=true);
-            *translate([rod_rad,0,0]) cube([height*2, height*2, height], center=true);
+            
+            translate([-gear_offset+motor_gear_offset,0,ring_bump/2]) scale([.5,1,1]) cylinder(r=motor_screw_sep/2+6, height+ring_bump, center=true);
         }
         
         //rod hole
@@ -955,10 +1009,10 @@ module shaft_motor_mount(){
         }
         
         //cut a slot for the motor
-        translate([-10-rod_rad-2,0,10+height/2-motor_inset]) cube([20,40,20], center=true);
+        translate([-gear_offset+motor_gear_offset,0,10+height/2-motor_inset]) cube([36*2,23,20], center=true);
         
-        //motor screw
-        translate([-rod_rad-2-motor_screw_inset,0,0]) cylinder(r=1.8, h=20, center=true);
+        //motor screws
+        for(i=[-1,1]) translate([-gear_offset+motor_gear_offset,motor_screw_sep/2*i,0]) cylinder(r=1.8, h=20, center=true);
     }
 }
 
