@@ -255,7 +255,7 @@ module gearsbyteethanddistance(t1=13,t2=51, d=60, teethtwist=1, which=1)
             //holes to lock to the screw
             for(i=[30:360/6:359]) rotate([0,0,i]) translate([22,0,5]) {
                 cylinder(r=3.4/2, h=5*2, center=true, $fn=30);
-                translate([0,0,-7.5]) cylinder(r=4, h=5*2, $fn=30);
+                translate([0,0,-7.5]) cylinder(r=3.5, h=5*2, $fn=30);
             }
 		}
 
