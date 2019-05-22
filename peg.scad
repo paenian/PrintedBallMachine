@@ -2,7 +2,7 @@ include<configuration.scad>
 use <pins.scad>
 use <base.scad>
 
-part = 4;
+part = 0;
 
 //laid out for printing
 if(part == 0)   //peg
@@ -154,7 +154,7 @@ module clip_insert(thick=peg_thick, peg_gap = 2.5){
 //added the option to make the peg have a locking pin, instead of a hook.
 //todo: add an option for a long pin with a screwhole in it
 module peg(peg=PEG_HOOK, peg_units=1, lower_peg_thick = peg_thick){
-    $fn=16;
+    $fn=32;
     
     extra_inset = 2;
     
@@ -163,6 +163,9 @@ module peg(peg=PEG_HOOK, peg_units=1, lower_peg_thick = peg_thick){
     front_inset = rear_inset+slop-extra_inset;
     
     cutoff=1;
+    
+    hook_len = wall*1.5;
+    hook_rad = peg_rad*3/4;
     
     translate([peg_sep/2,0,peg_sep*1.5]) 
     difference(){
@@ -175,10 +178,10 @@ module peg(peg=PEG_HOOK, peg_units=1, lower_peg_thick = peg_thick){
 			
             //top front
             if(peg==PEG_HOOK){
-                translate([0,-wall+.1,0]) rotate([90,0,0]) cylinder(r1=peg_rad, r2=peg_rad*3/4, h=wall+peg_rad-front_inset);
-                translate([0,-wall*2-front_inset,0]) sphere(r=peg_rad*3/4);
-                translate([0,-wall*2-front_inset,0]) rotate([peg_angle,0,0]) cylinder(r1=peg_rad*3/4, r2=peg_rad*3/4-slop, h=wall*2);
-                translate([0,-wall*2-front_inset,0]) rotate([peg_angle,0,0]) translate([0,0,wall*2]) sphere(r=peg_rad*3/4-slop);
+                translate([0,-wall+.1,0]) rotate([90,0,0]) cylinder(r1=peg_rad, r2=hook_rad, h=wall+peg_rad-front_inset);
+                translate([0,-wall*2-front_inset,0]) sphere(r=hook_rad);
+                translate([0,-wall*2-front_inset,0]) rotate([peg_angle,0,0]) cylinder(r1=hook_rad, r2=hook_rad-slop, h=hook_len);
+                translate([0,-wall*2-front_inset,0]) rotate([peg_angle,0,0]) translate([0,0,hook_len]) sphere(r=hook_rad-slop);
             }
             
             if(peg==PEG_LOWER_HOOK){
@@ -204,11 +207,15 @@ module peg(peg=PEG_HOOK, peg_units=1, lower_peg_thick = peg_thick){
             //lower peg
             translate([0,0,-peg_sep*peg_units]) rotate([90,0,0]) translate([0,0,-lower_peg_thick]) cylinder(r2=peg_rad, r1=peg_rad-slop, h=lower_peg_thick+wall);
             translate([0,lower_peg_thick,-peg_sep*peg_units]) sphere(r=peg_rad-slop);
+            translate([0,-wall,-peg_sep*peg_units]) sphere(r=peg_rad-slop);
         }
         
         //cut off top and bottom for easier printing
         translate([100+peg_rad-cutoff,0,0]) cube([200,200,200], center=true);
         translate([-100-peg_rad+cutoff,0,0]) cube([200,200,200], center=true);
+        
+        //smooth out the fron
+        
         
         //if it's a lower peg, delete the bottom
         if(peg==PEG_LOWER_HOOK){

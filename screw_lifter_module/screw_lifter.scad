@@ -5,7 +5,7 @@ use <../clank_drop/clank_drop.scad>;
 use <../screw_drop/bowl_drop.scad>;
 use <../ball_return/ball_return.scad>;
 
-part = 109;
+part = 1;
 
 //%cylinder(r=in*1.5, h=in*10);
 
@@ -15,12 +15,13 @@ screw_offset = -wall-screw_rad-.9;
 screw_offset = -in*1.5;
 screw_length = 5.5;
 screw_inset = ball_rad*1.5;
+screw_rad = 19;
 
 //oriented out for printing
 if(part == 0)
     screw_inlet();
 if(part == 1)
-    screw_segment_2(length=screw_length, starts=2, top=PEG, inset = screw_inset);
+    screw_segment_inset(length=5, starts=2, top=PEG, bot=MOTOR, screw_rad = screw_rad);
 if(part == 2)
     screw_segment_2(length=screw_length, starts=1, top=PEG, inset = screw_inset);
 if(part == 3)
@@ -223,121 +224,96 @@ module screw_direct_inlet(height = in*5, length=peg_sep*6, width=peg_sep*3){
 
 //this is the lift module :-)
 module screw_inlet(){
+    screw_rad = 19;
     motor_width = 20;
     open_angle=0;
     
     drop = .25*in/2;
     back_drop = .25*in/4;
     
+    %translate([in*3,0,in*2]) slope_module(size = [4, -.45]);
+    
+    exit_height = 5*in;
+    
     difference(){
         union(){
-            inlet(length=3, inset=0, outlet=NONE, hanger_height=4);
+            inlet(length=3, inset=0, outlet=CENTER, hanger_height=5);
             
             //strengthen the hangers
             difference(){
                 union(){
-                    hanger(solid=1, hole=[1,5], drop = in*4, rot=-33);
-                    hanger(solid=1, hole=[3,5], drop = in*4, rot=33);
+                    hanger(solid=1, hole=[1,6], drop = in*5, rot=-25);
+                    hanger(solid=1, hole=[3,6], drop = in*5, rot=25);
                 }
                 hanger(solid=-1, hole=[1,5]);
                 hanger(solid=-1, hole=[3,5]);
             }
             
-            
-            //motor hangs under the inlet, with an adustable angle centered on the hole in the floor.
-            %translate([peg_sep*2,screw_offset,0]) rotate([0,-90+angle,0]) rotate([0,90,0]) rotate([0,0,-90]) translate([0,0,-21]) motor_holes();
-            
-
-            
-            //guide track
-           translate([in*2,in/2+screw_offset,0]) for(i=[0,1]) mirror([i,0,0]) rotate([0,0,open_angle]) translate([screw_rad+ball_rad+wall*1.5,0,0]) rotate([0,-90,0]) track(rise = 0, run = in*(4.25+i*.125));
-            
-            //balls
-            *translate([in*3-ball_rad-wall,screw_offset,in*3+10]) sphere(r=ball_rad);
-           
-           //new floor, for better guides
-           hull(){
-               mirror([0,1,0]) cube([in*3, in*3, in*.5]);
-               mirror([0,1,0]) translate([in*2,0,0]) cube([in, in*3, in/2+in*.5]);
-           }
-           
-           //top exit track
-           //rear
-           translate([peg_sep*3,in/2+screw_offset+in,in*4-back_drop*4]) mirror([1,0,0]) track(rise=back_drop*2, run=in*2, solid=1, end_angle=90);
-           translate([peg_sep*1,-in/2+screw_offset+1,in*4-back_drop]) mirror([0,0,0]) rotate([0,0,90]) track(rise=-back_drop, run=in, solid=1, end_angle=0);
-           
-           //front
-           translate([peg_sep*2,in/2+screw_offset-.75,in*4-back_drop*2]) mirror([1,1,0]) track(rise=-back_drop*2, run=in*2, solid=1, end_angle=90);
-           
-           //exit supports
-           translate([in*1.25,in/2+screw_offset+in*.15,in*3.5]) scale([1,1.3,1]) {
-               //track(rise = -in/4, run = in*3);
-               hull(){
-                   translate([in*1.333+in/2-5, -track_rad-wall, track_rad/2-1]) cube([track_rad/2, track_rad*5, track_rad], center=true);
-                   translate([in*.75, -track_rad-wall, -track_rad*1.5]) cube([in*1.5, track_rad*2, track_rad], center=true);
-               }
-           }
-        }
-        
-        //rear exit hole
-        translate([peg_sep*1,-in/2+screw_offset+1,in*4-back_drop]) mirror([0,0,0]) rotate([0,0,90]) track(rise=-back_drop, run=in, solid=1, end_angle=0, solid=-1);
-        //front exit hole
-        translate([peg_sep*2,in/2+screw_offset-.75,in*4-back_drop*2]) mirror([1,1,0]) track(rise=-back_drop*2, run=in*2, solid=1, end_angle=90, solid=-1);
-        
-        //guide track hollow
-        translate([in*2,screw_offset,wall*4]) hull() for(i=[0,1]) mirror([i,0,0]) rotate([0,0,open_angle]) translate([screw_rad-1.5,0,0]) scale([1,.9,1]) {
-               //track(rise = 0, run = in*4.5, solid=-1);
-               cylinder(r=ball_rad+wall, h=in*4.5);
-           }
-               
-           //cube cut
-           translate([100+in*3,0,100]) cube([200,200,300], center=true);
-           
-           //extra hanger holes to avoid hitting ball returns etc.
-            for(i=[1:3])
-                for(j=[2:5])
-                    hanger(solid = -1, hole=[i,j], drop = 0);
-        
-        
-        //ball entry to the guides
-        translate([in*2,screw_offset,ball_rad+wall*2]) for(i=[0,1]) rotate([0,0,i*180]) translate([-screw_rad,0,0]) {
-            hull(){
-                sphere(r=ball_rad+wall);
-                translate([screw_rad,-in*3-screw_offset+ball_rad+wall*2,wall*2]) sphere(r=ball_rad+wall);
-                //this added guy is an attempt to stop screw jams.
-                translate([screw_rad,-in*3-screw_offset+ball_rad+wall*2,wall*2+ball_rad*2]) sphere(r=ball_rad+wall);
-                translate([0,0,wall*2+ball_rad]) sphere(r=ball_rad+wall/2);
+            //ball guides
+            intersection(){
+                translate([in*2, screw_offset, 1])
+                for(i=[60:360/3:359]) rotate([0,0,i]) translate([screw_rad+wall/2,0,0]){
+                    union(){
+                        scale([2,1,1]) cylinder(r=wall*1.75, h=4.875*in, $fn=6);
+                        //this is the exit tray
+                        hull(){
+                            translate([0,0,exit_height-in*1.5-.1]) scale([2,1,1]) cylinder(r=wall*1.75, h=.2, $fn=6);
+                            translate([-wall,0,exit_height-.1]) scale([1,1,1]) cylinder(r=in*1.625, h=.2, $fn=6);
+                        }
+                    }
+                }
+                translate([0,-in*3,0]) cube([in*3, in*3, in*9]);
             }
+        }
+           
+        //exit tray hollow
+        translate([in*2, screw_offset, 0]) intersection(){
+            translate([wall/2,0,0]) for(i=[60:360/3:359]) rotate([0,0,i]) translate([screw_rad+wall/2,0,0]){
+                //this is the exit tray
+                difference(){
+                    hull(){
+                        translate([0,0,exit_height-in*1.5-.1]) scale([2,1,1]) cylinder(r=wall*1.75, h=.2, $fn=6);
+                        translate([-wall,0,exit_height+5-.1]) scale([1,1,1]) cylinder(r=in*1.625, h=.2, $fn=6);
+                    }
+                    translate([-wall*1.75,0,0]) scale([2,1,1]) rotate([0,0,-15]) cylinder(r1=wall*4, r2=wall*1.25, h=5*in, $fn=6);
+                }
+            }
+            //sloped floor
+            translate([0,0,exit_height]) hull(){
+                translate([-in*2,0,0]) cube([.1, in*3-wall*2, wall*2], center=true);
+                translate([in*2,0,0]) cube([.1, in*3-wall*2, wall*2+in/2], center=true);
+            }
+            
+            
         }
         
         //ball paths
-        translate([in*2,screw_offset,ball_rad+wall*2]) for(i=[0,1]) mirror([0,i,0]) {
-            hull(){
-                translate([0,-in*3-screw_offset+ball_rad+wall*2,wall*2]) sphere(r=ball_rad+wall);
-                
-                translate([-in*1.5,-in*3-screw_offset+ball_rad+wall*2,wall*3]) sphere(r=ball_rad+wall);
-                //translate([in*.5,-in*3-screw_offset+ball_rad+wall*2,wall*3]) sphere(r=ball_rad+wall);
-            }
-            
-            hull(){
-                translate([-in*1.5,-in*3-screw_offset+ball_rad+wall*2,wall*3]) sphere(r=ball_rad+wall);
-                translate([-in*1.5,0,wall*3.5]) sphere(r=ball_rad+wall);
-            }  
+        translate([in*2, screw_offset, 0])
+        for(i=[60+40:360/3:359]) rotate([0,0,i]) translate([screw_rad-ball_rad*.6,0,in]){
+            cylinder(r=ball_rad+1.25, h=200);
         }
         
-        //motor mount
-        translate([in*2,screw_offset,0]) rotate([0,0,180]) motor_holes();
+        //extra hanger holes to avoid hitting ball returns etc.
+        for(i=[1:3])
+            for(j=[2:6])
+                hanger(solid = -1, hole=[i,j], drop = 0);
         
+        //motor mount
+        translate([in*2,screw_offset,0]) rotate([0,0,165]) motor_holes();
                 
         // hole for the screw
         translate([in*2,screw_offset, 0]) hull() {
             translate([0,0,-peg_sep/2]) cylinder(r=screw_rad+.25, h=200);
-            *rotate([0,30,0]) translate([0,0,-peg_sep]) cylinder(r=screw_rad+1, h=100);
-            *rotate([0,60,0]) translate([0,0,-peg_sep]) cylinder(r=screw_rad+1, h=100);
         }
         
+        //cutoff the exit
+        translate([100+in*3-.5,0,0]) cube([200,200,400], center=true);
+        
+        //cutoff the back of the exit tray
+        translate([0,100,0]) cube([200,200,400], center=true);
+        
         //rough in the screw
-        %translate([in*2,-in*1.5,0]) screw_segment_2(length=screw_length, starts=2, top=ROUND);
+        %translate([in*2,-in*1.5,0]) screw_segment_inset(length=5, starts=2, top=PEG, bot=PEG, screw_rad = screw_rad);
         
         //marbles in the chute
         %translate([in*1.45, -in*1.5, in*1.75]) sphere(r=ball_rad);
@@ -371,20 +347,36 @@ module screw_inlet_2(height = screw_length, length = in*5, width = in*5.4, legs=
         union(){
             if(legs == false){
                 translate([screw_offset,0,0]) difference(){  //box
-                    intersection(){
-                        translate([0,0,(in*1.5)/2]) cube([length, width, in*1.5], center=true);
-                        translate([0,0,motor_dimple_h+wall+in/4]) cylinder(r=in*3.333+wall, h=in*4, center=true, $fn=90);
+                    union(){
+                        intersection(){
+                            translate([0,0,(in*1.5)/2]) cube([length, width, in*1.5], center=true);
+                            translate([0,0,motor_dimple_h+wall+in/4]) cylinder(r=in*3.333+wall, h=in*4, center=true, $fn=90);
+                        }
+                        hull(){
+                            translate([in,-in/2,(in*1.5)/2+in*.625]) cube([length/2, width+in, in*.25], center=true);
+                            translate([in,-in/2,(in*1.5)/2-in*.625]) cube([length/2, width-in*1.5, in*.25], center=true);
+                        }
+                        translate([-in,0,(in*1.5)/2+in*.625]) cube([length/2, width, in*.75], center=true);
                     }
                 
                     //slope in towards the screw
                     intersection(){
                         hull(){
-                            translate([-screw_offset,0,motor_dimple_h+wall+in/2]) cylinder(r=in*3.333, h=in*2, $fn=90);
+                            translate([-screw_offset,0,motor_dimple_h+wall+in/2]) cylinder(r=in*4, h=in*2, $fn=90);
                             translate([-screw_offset,0,0]) translate([0,0,motor_dimple_h+wall]) cylinder(r=screw_rad, h=height+10); //this lets the marbles into the screw, too
-                            translate([in*3,0,motor_dimple_h+wall+in*1.5]) cube([in, in*5, in], center=true);
+                            translate([in*3,-in/2,motor_dimple_h+wall+in*1.5]) cube([in, in*6.25, in], center=true);
                         }
-                        translate([0,0,in]) cube([length-wall*2, width-wall*2, in*2], center=true);
-                        translate([0,0,motor_dimple_h]) cylinder(r=in*3.333, h=in*2, $fn=90);
+                        union(){
+                            translate([0,0,in]) cube([length-wall*2, width-wall*2, in*2], center=true);
+                            hull(){
+                                translate([in,-in/2,(in*1.5)/2+in*.625+in*.25]) cube([length/2-wall*2, width+in-wall*2, in*.5], center=true);
+                                translate([in,-in/2,(in*1.5)/2-in*.625+2]) cube([length/2-wall*2, width-in*1.5-wall*2, in*.25], center=true);
+                            }
+                        }
+                        union(){
+                            translate([0,0,motor_dimple_h]) cylinder(r=in*3.333, h=in*2, $fn=90);
+                            translate([in,-in/2,(in*1.5)/2+in*.625+2]) cube([length/2-wall*2, width+in-wall*2, in*2], center=true);
+                        }
                     }
                 }
             }else{
@@ -432,7 +424,7 @@ module screw_inlet_2(height = screw_length, length = in*5, width = in*5.4, legs=
         //attach bottom to the pegboard
         if(legs == false){
             //side holes for the pegboard
-            for(j=[-peg_sep,0,peg_sep]) for(i=[0,1]) mirror([0,i,0]) translate([screw_offset-length/2+peg_sep/2+j,width/2,peg_sep/2]) {
+            for(k=[0:1]) for(j=[-peg_sep,0,peg_sep]) for(i=[0,1]) mirror([0,i,0]) translate([screw_offset-length/2+peg_sep/2+j,width/2,peg_sep/2+peg_sep*k]) {
                 rotate([90,0,0]) cylinder(r=m5_rad, h=in, center=true);
                 hull(){
                     translate([0,-wall,0]) rotate([90,0,0]) rotate([0,0,45]) cylinder(r=m5_sq_nut_rad, h=m5_nut_height, $fn=4);
@@ -1171,9 +1163,14 @@ module screw_segment_inset(length = 4, starts = 2, top = PEG, bot = PEG, screw_r
         }
         
         //d slot for the connection
-        if(bot == MOTOR) {
+        if(bot == SPUR_MOTOR) {
             translate([0,0,-.1]) rotate([0,0,90]) d_slot(shaft=6.33, height=15, dflat=.4+.3, round_inset = 0, round_height = 0, double_d=false);
             translate([0,0,-.1]) rotate([0,0,90]) cylinder(r1=6.9/2, r2=6.7/2, h=3.5);
+        }
+        
+        //d slot for the connection
+        if(bot == MOTOR) {
+            rotate([0,0,90]) translate([0,0,-.1]) d_slot(shaft=7.25, height=10, dflat=.4+.6, double_d=true, round_inset = 0, round_height = 0);
         }
         
         if(bot == PEG) {
@@ -1186,6 +1183,9 @@ module screw_segment_inset(length = 4, starts = 2, top = PEG, bot = PEG, screw_r
         
         //flatten the base
         translate([0,0,-50]) cube([50,50,100], center=true);
+        
+        //cut in half
+        *translate([150,0,0]) cube([300,300,300], center=true);
     }
 }
 

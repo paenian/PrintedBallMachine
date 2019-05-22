@@ -2,44 +2,47 @@ include<configuration.scad>
 use <pins.scad>
 %pegboard(size = [12,12]);
 
-part = 6;
+part = 2;
 
 //bare inlet
 if(part == 0)
-    inlet();
+    rotate([-90,0,0]) inlet();
 
 if(part == 1)
-    inlet(length=2);
+    rotate([-90,0,0]) inlet(length=2);
 
 if(part == 2)
-    inlet(length=3);
+    rotate([-90,0,0]) inlet(length=3);
 
 if(part == 3)
-    slope_module(size = [2, -.45]);
+    rotate([-90,0,0]) slope_module(size = [2, -.45]);
 
 if(part == 4)
-    slope_module(size = [3, -.45]);
+    rotate([-90,0,0]) slope_module(size = [3, -.45]);
 
 if(part == 5)
-    slope_module(size = [4, -.45]);
+    rotate([-90,0,0]) slope_module(size = [4, -.45]);
 
 if(part == 6)
-    slope_module(size = [5, -.45]);
+    rotate([-90,0,0]) slope_module(size = [5, -.45]);
 
 if(part == 7)
-    offset_slope_module(size = [3, -.45]);
+    rotate([-90,0,0]) offset_slope_module(size = [3, -.45]);
 
 if(part == 8)
-    offset_slope_module(size = [4, -.45]);
+    rotate([-90,0,0]) offset_slope_module(size = [4, -.45]);
 
 if(part == 9)
-    offset_slope_module(size = [5, -.45]);
+    rotate([-90,0,0]) offset_slope_module(size = [5, -.45]);
 
 if(part == 10)
-    wide_slope_module(size = [4, -.45]);
+    rotate([-90,0,0]) wide_slope_module(size = [3, -.45]);
 
 if(part == 11)
-    wide_slope_module(size = [5, -.45]);
+    rotate([-90,0,0]) wide_slope_module(size = [4, -.45]);
+
+if(part == 12)
+    rotate([-90,0,0]) wide_slope_module(size = [5, -.45]);
 
 
 if(part == 0)
@@ -86,7 +89,7 @@ module slope_module(size = [4, -.5], width=3, inlet = NORMAL){
 		  //cut the end flat
 		  translate([50+in*size[0]+in-1,0,in*2]) cube([100,100,100], center=true);
         
-         #hanger(solid=-1, hole=[floor(size[0])+1,3], drop = in/2);
+         hanger(solid=-1, hole=[floor(size[0])+1,3], drop = in/2);
     }
 }
 
@@ -259,6 +262,11 @@ module inlet(height = 1, width = 3, length = 1, hanger_height=1, lift=5, outlet=
                             translate([0,inlet_y-in/2,in/2]) translate([0,0,0]) sphere(r=in/2-wall);
                             translate([0,inlet_y-in/2,in*3/4]) translate([0,0,0]) sphere(r=ball_rad);
                         }
+                    }else if(outlet == CENTER){
+                        hull(){
+                            translate([inlet_x,inlet_y/2,in/2]) translate([0,0,0]) sphere(r=in/2-wall);
+                            translate([0,inlet_y/2,in*3/4]) translate([0,0,0]) sphere(r=ball_rad);
+                        }
                     }else{
                         hull(){
                             translate([inlet_x,inlet_y-in/2,in/2]) translate([0,0,0]) sphere(r=in/2-wall);
@@ -298,7 +306,7 @@ module inlet(height = 1, width = 3, length = 1, hanger_height=1, lift=5, outlet=
                     translate([inlet_x,inlet_y-in/2,in/2]) translate([0,0,0]) sphere(r=in/2-wall);
                     translate([inlet_x-in/2,inlet_y-in/2,in/2+wall]) translate([0,0,0]) sphere(r=ball_rad+wall/2);
                     translate([inlet_x,inlet_y+in/2-in*width,in/2]) translate([0,0,0]) sphere(r=in/2-wall);
-                    #translate([inlet_x-in/2,inlet_y+in/2-in*width,in/2+wall]) translate([0,0,0]) sphere(r=ball_rad+wall/2);
+                    translate([inlet_x-in/2,inlet_y+in/2-in*width,in/2+wall]) translate([0,0,0]) sphere(r=ball_rad+wall/2);
                 }
             }
             
@@ -474,16 +482,16 @@ module hanger(solid=0, hole=[1,4], slot_size = 0, drop = in/2, rot = 0, chamfer_
         for(i=[0:1]){
             //chamfer
             hull() for(j=[0:1]) mirror([j,0,0]) {
-                translate([slot_size/2,0,peg_sep/2]) rotate([90,0,0]) translate([0,0,wall/2]) mirror([0,0,i]) translate([0,0,chamfer_offset]) cylinder(r1=peg_rad-slop, r2=peg_rad+wall+wall, h=wall*2);
+                translate([slot_size/2,0,peg_sep/2]) rotate([90,0,0]) translate([0,0,wall/2]) mirror([0,0,i]) translate([0,0,chamfer_offset]) cylinder(r1=peg_rad-slop, r2=peg_rad+wall/2, h=wall/2);
             }
             //center bore
             hull() for(j=[0:1]) mirror([j,0,0]) {
-                translate([slot_size/2,0,peg_sep/2]) rotate([90,0,0]) translate([0,0,wall/2]) mirror([0,0,i]) translate([0,0,-.1]) cylinder(r=peg_rad+slop, h=wall*2);
+                translate([slot_size/2,0,peg_sep/2]) rotate([90,0,0]) translate([0,0,wall/2]) mirror([0,0,i]) translate([0,0,-.1]) cylinder(r=peg_rad+slop, h=wall*2+.1);
             }
             
             //cap area, in case of thicker walls
             hull() for(j=[0:1]) mirror([j,0,0]) {
-                translate([slot_size/2,0,peg_sep/2]) rotate([90,0,0]) translate([0,0,wall/2]) mirror([0,0,i]) translate([0,0,wall/2-.1]) cylinder(r=peg_cap_rad+slop*2, h=wall*2);
+                translate([slot_size/2,0,peg_sep/2]) rotate([90,0,0]) translate([0,0,wall/2]) mirror([0,0,i]) translate([0,0,wall/2-.1]) cylinder(r=peg_cap_rad+slop*2, h=wall+.1);
             }
         }
         //cut out t
