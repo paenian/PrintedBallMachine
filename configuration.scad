@@ -45,6 +45,7 @@ PEG_NONE = 0;
 
 m3_rad = 3/2 + slop;
 m3_cap_rad = 6/2 + slop;
+m3_nut_rad = 6.6/2;
 
 
 m5_nut_rad = 8.79/2;
