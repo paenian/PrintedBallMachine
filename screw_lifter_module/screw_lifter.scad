@@ -762,6 +762,8 @@ module two_inch_screw_base(){
     base_height = in*1.75;
     screw_ring = 10;
     
+    bearing_lift = .75;
+    
     wall = 4;
     
     %translate([screw_rad+in,0,in*3]) sphere(r=in);
@@ -799,14 +801,17 @@ module two_inch_screw_base(){
         }
         
         //thrust bearing hole
-        translate([0,0,wall]) 
+        translate([0,0,wall+bearing_lift]) 
         difference(){
             union(){
-                cylinder(r=thrust_rad+.25, h=base_height);
+                cylinder(r=thrust_rad+.3, h=base_height, $fn=high_facets);
                 translate([0,0,-wall/2]) cylinder(r=thrust_flat_rad-.25, h=base_height);
             }
             
-            translate([0,0,-wall/2-.1]) cylinder(r=thrust_inner_rad-1, h=thrust_thick/2);
+            translate([0,0,-wall/2-.1]) cylinder(r=thrust_inner_rad-1, h=thrust_thick/2-1);
+            translate([0,0,-wall/2-.1]) rotate_extrude(){
+                translate([thrust_inner_rad-1,0,0]) circle(r=1.5, $fn=4);
+            }
         }
         
         //rod holes
