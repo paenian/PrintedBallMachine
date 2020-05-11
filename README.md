@@ -2,6 +2,9 @@ The PrintedBallMachine!
 
 Herein are some tips for working with the printed ball machine - making your own modules, first, and later making your own parts.
 
+# Video!
+https://www.youtube.com/watch?v=hsoqrZ5NXNs
+
 # Rough Idea
 The PBM is a marble machine that utilized pegboard for its vertical structure.  In order to make modular units, the pegboard is cut into 12" sections, with defined inlet and exit for linking together.  The machines are standardized on 5/8" steel ball bearings, because steel is satisfying.  This is the same size as the common glass marble, however there is much more variation in marbles than there are in ball bearings.
 
